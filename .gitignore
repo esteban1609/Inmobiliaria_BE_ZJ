@@ -1,0 +1,40 @@
+## .NET / Visual Studio / VS Code
+
+# Build results
+bin/
+obj/
+out/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+
+# NuGet
+*.nupkg
+*.snupkg
+
+# Secretos y config local (para cuando los agregues)
+appsettings.Development.json
+appsettings.*.local.json
+secrets.json
+.env
+.env.local
+*.pfx
+
+# Logs
+*.log
+logs/
+
+# Test results
+[Tt]est[Rr]esult*/
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db
