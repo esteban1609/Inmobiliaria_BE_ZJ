@@ -15,7 +15,7 @@ namespace Inmobiliaria_BarrosoEsteban
 		{
 			this.configuration = configuration;
 			connectionString = configuration["ConnectionStrings:DefaultConnection"];
-			//connectionString = configuration["ConnectionStrings:MySql"];
+			
 		}
 	}
 }
