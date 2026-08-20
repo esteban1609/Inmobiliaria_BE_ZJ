@@ -1,10 +1,11 @@
+
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Inmobiliaria_.Net_Core.Models
-{
+namespace Inmobiliaria_BarrosoEsteban.Models;
+
 	public class Inquilino
 	{
 		[Key]
@@ -20,4 +21,5 @@ namespace Inmobiliaria_.Net_Core.Models
 		[Required, EmailAddress]
 		public string Email { get; set; }
 	}
-}
+
+
