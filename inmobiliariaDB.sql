@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS inquilino;
 -- =========================================================
 
 CREATE TABLE propietario (
-    id_propietario   INT AUTO_INCREMENT PRIMARY KEY,
+    idpropietario   INT AUTO_INCREMENT PRIMARY KEY,
     dni              VARCHAR(15) NOT NULL UNIQUE,
     nombre           VARCHAR(100) NOT NULL,
     apellido         VARCHAR(100) NOT NULL,
