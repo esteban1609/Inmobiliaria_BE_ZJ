@@ -17,9 +17,7 @@ A continuación se presenta el esquema del modelo de datos correspondiente a la 
 
 ### Diagrama Entidad-Relación (DER) / Diagrama de Clases
 
-![Diagrama del Proyecto](./docs/der.png)
-
-> **Nota:** reemplazar `./docs/der.png` por la ruta real del diagrama dentro del repositorio (por ejemplo, agregándolo a una carpeta `/docs` o `/img`).
+![Diagrama del Proyecto](./docs/ER_INMOBILIARIA.jpg)
 
 <details>
 <summary>Ver diagrama en código Mermaid (Opcional)</summary>
