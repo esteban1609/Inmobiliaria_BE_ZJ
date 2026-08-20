@@ -1,0 +1,32 @@
+@model Propietario
+
+<h1>Nuevo Propietario</h1>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label>DNI</label>
+        <input asp-for="Dni" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input asp-for="Nombre" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Apellido</label>
+        <input asp-for="Apellido" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Teléfono</label>
+        <input asp-for="Telefono" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Email</label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Clave</label>
+        <input asp-for="Clave" type="password" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Inmobiliaria_BarrosoEsteban.Models;
 
 namespace Inmobiliaria_BarrosoEsteban
 {
@@ -11,8 +12,6 @@ namespace Inmobiliaria_BarrosoEsteban
 		int Baja(int id);
 		int Modificacion(T p);
 
-		//IList<T> ObtenerLista(int paginaNro = 1, int tamPagina = 10);
-		//int ObtenerCantidad();
-		//T? ObtenerPorId(int id);
+		
 	}
 }

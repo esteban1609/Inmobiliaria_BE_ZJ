@@ -1,0 +1,34 @@
+@model IEnumerable<Propietario>
+
+<h1>Propietarios</h1>
+
+<p><a asp-action="Create">Nuevo Propietario</a></p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>DNI</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Dni</td>
+                <td>@item.Nombre</td>
+                <td>@item.Apellido</td>
+                <td>@item.Telefono</td>
+                <td>@item.Email</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.IdPropietario">Editar</a> |
+                    <a asp-action="Delete" asp-route-id="@item.IdPropietario">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

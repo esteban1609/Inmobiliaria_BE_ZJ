@@ -5,7 +5,7 @@ namespace Inmobiliaria_BarrosoEsteban
 {
 	public interface IRepositorioPropietario : IRepositorio<Propietario>
 	{
-		//Propietario? ObtenerPorEmail(string email);
-		//IList<Propietario> BuscarPorNombre(string nombre);
+		List<Propietario> Listar();
+    	Propietario ObtenerPorId(int id);
 	}
 }
