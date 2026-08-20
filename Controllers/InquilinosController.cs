@@ -15,9 +15,10 @@ namespace Inmobiliaria_.Net_Core.Controllers
 
         public IActionResult Index()
         {
-            var lista=repositorio.Listar();
+            var lista = repositorio.Listar();
             return View(lista);
         }
+
         public IActionResult Create()
         {
             return View();
@@ -35,13 +36,40 @@ namespace Inmobiliaria_.Net_Core.Controllers
             return View(inquilino);
         }
 
-        public IActionResult Edit(int id, Inquilino i)
+        public IActionResult Edit(int id)
         {
-            i.IdInquilino = id;
-            repositorio.Modificacion(i);
-            return RedirectToAction(nameof(Index));
+            var inquilino = repositorio.ObtenerPorId(id);
+            if (inquilino == null)
+            {
+                return NotFound();
+            }
+            return View(inquilino);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Inquilino inquilino)
+        {
+            try
+            {
+                inquilino.IdInquilino = id;
+
+                if (ModelState.IsValid)
+                {
+                    repositorio.Modificacion(inquilino);
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return View(inquilino);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View(inquilino);
+            }
+        }
+
+        // GET: Inquilinos/Delete/5
         public IActionResult Delete(int id)
         {
             var i = repositorio.ObtenerPorId(id);
@@ -49,7 +77,8 @@ namespace Inmobiliaria_.Net_Core.Controllers
             return View(i);
         }
 
-        [HttpPost]
+        // POST: Inquilinos/Delete/5
+        [HttpPost, ActionName("Delete")] // <-- Mapea la acción para que responda a Delete
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
