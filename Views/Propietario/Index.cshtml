@@ -2,7 +2,11 @@
 
 <h1>Propietarios</h1>
 
-<p><a asp-action="Create">Nuevo Propietario</a></p>
+<p> 
+    <a asp-action="Create" class= "btn btn-primary">
+        Nuevo Propietario
+    </a>
+</p>
 
 <table class="table">
     <thead>
@@ -12,6 +16,7 @@
             <th>Apellido</th>
             <th>Teléfono</th>
             <th>Email</th>
+            <th>Estado</th>
             <th></th>
         </tr>
     </thead>
@@ -25,8 +30,27 @@
                 <td>@item.Telefono</td>
                 <td>@item.Email</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.IdPropietario">Editar</a> |
-                    <a asp-action="Delete" asp-route-id="@item.IdPropietario">Eliminar</a>
+                    @if (item.Estado)
+                    {
+                        <span class="badge bg-success">Activo</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Inactivo</span>
+                    }
+                </td>
+                <td>
+                    @if (item.Estado)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.IdPropietario" class="btn btn-primary">Editar</a> 
+                        <a asp-action="Delete" asp-route-id="@item.IdPropietario" class="btn btn-danger">dar de baja</a>
+                    }
+                    else
+                    {
+                        <form asp-action="Reactivar" asp-route-id="@item.IdPropietario" method="post" style="display:inline">
+                            <button type="submit" class="btn btn-success">dar de alta</button>
+                        </form>
+                    }
                 </td>
             </tr>
         }

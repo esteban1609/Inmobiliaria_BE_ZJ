@@ -66,5 +66,12 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             repositorio.Baja(id);
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        public IActionResult Reactivar(int id)
+        {
+            repositorio.Reactivar(id);
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

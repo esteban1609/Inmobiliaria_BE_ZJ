@@ -23,4 +23,5 @@ public class Propietario
 		public string Email { get; set; } = "";
 		[Required(ErrorMessage = "La clave es obligatoria"), DataType(DataType.Password)]
 		public string Clave { get; set; } = "";
+		public Boolean Estado{get; set;} = true;  
 }

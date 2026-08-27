@@ -41,25 +41,22 @@ public class RepositorioPropietario : RepositorioBase, IRepositorioPropietario
     }
 
     public int Baja(int id)
+{
+    int res = -1;
+    using (MySqlConnection connection = new MySqlConnection(connectionString))
     {
-        int res = -1;
+        string sql = @"UPDATE propietario SET estado = FALSE WHERE id_propietario = @id;";
 
-        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        using (MySqlCommand command = new MySqlCommand(sql, connection))
         {
-            string sql = @"DELETE FROM propietario 
-                           WHERE IdPropietario = @id;";
+            command.Parameters.AddWithValue("@id", id);
 
-            using (MySqlCommand command = new MySqlCommand(sql, connection))
-            {
-                command.Parameters.AddWithValue("@id", id);
-
-                connection.Open();
-                res = command.ExecuteNonQuery();
-            }
+            connection.Open();
+            res = command.ExecuteNonQuery();
         }
-
-        return res;
     }
+    return res;
+}
 
     public int Modificacion(Propietario p)
     {
@@ -95,113 +92,90 @@ public class RepositorioPropietario : RepositorioBase, IRepositorioPropietario
     }
 
     public List<Propietario> Listar()
+{
+    List<Propietario> lista = new List<Propietario>();
+    using (MySqlConnection connection = new MySqlConnection(connectionString))
     {
-        List<Propietario> lista = new List<Propietario>();
+        string sql = @"SELECT id_propietario, nombre, apellido, dni, telefono, email, clave, estado 
+            FROM propietario;";
 
-        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        using (MySqlCommand command = new MySqlCommand(sql, connection))
         {
-            string sql = @"SELECT IdPropietario, nombre, apellido, dni, telefono, email, clave 
-                           FROM propietario;";
-
-            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            connection.Open();
+            using (MySqlDataReader reader = command.ExecuteReader())
             {
-                connection.Open();
-
-                using (MySqlDataReader reader = command.ExecuteReader())
+                while (reader.Read())
                 {
-                    while (reader.Read())
+                    Propietario p = new Propietario
                     {
-                        Propietario p = new Propietario
-                        {
-                            IdPropietario = reader.GetInt32(
-                                reader.GetOrdinal("IdPropietario")
-                            ),
-                            Nombre = reader.GetString(
-                                reader.GetOrdinal("nombre")
-                            ),
-                            Apellido = reader.GetString(
-                                reader.GetOrdinal("apellido")
-                            ),
-                            Dni = reader.GetString(
-                                reader.GetOrdinal("dni")
-                            ),
-                            Telefono = reader.IsDBNull(
-                                reader.GetOrdinal("telefono")
-                            )
-                                ? null
-                                : reader.GetString(reader.GetOrdinal("telefono")),
-                            Email = reader.IsDBNull(
-                                reader.GetOrdinal("email")
-                            )
-                                ? null
-                                : reader.GetString(reader.GetOrdinal("email")),
-                            Clave = reader.GetString(
-                                reader.GetOrdinal("clave")
-                            )
-                        };
-
-                        lista.Add(p);
-                    }
+                        IdPropietario = reader.GetInt32(reader.GetOrdinal("id_propietario")),
+                        Nombre = reader.GetString(reader.GetOrdinal("nombre")),
+                        Apellido = reader.GetString(reader.GetOrdinal("apellido")),
+                        Dni = reader.GetString(reader.GetOrdinal("dni")),
+                        Telefono = reader.IsDBNull(reader.GetOrdinal("telefono")) ? null : reader.GetString(reader.GetOrdinal("telefono")),
+                        Email = reader.IsDBNull(reader.GetOrdinal("email")) ? null : reader.GetString(reader.GetOrdinal("email")),
+                        Clave = reader.GetString(reader.GetOrdinal("clave")),
+                        Estado = reader.GetBoolean(reader.GetOrdinal("estado"))
+                    };
+                    lista.Add(p);
                 }
             }
         }
-
-        return lista;
     }
+    return lista;
+}
 
     public Propietario ObtenerPorId(int id)
+{
+    Propietario p = null;
+    using (MySqlConnection connection = new MySqlConnection(connectionString))
     {
-        Propietario p = null;
+        string sql = @"SELECT id_propietario, nombre, apellido, dni, telefono, email, clave, estado 
+            FROM propietario 
+            WHERE id_propietario = @id;";
 
-        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        using (MySqlCommand command = new MySqlCommand(sql, connection))
         {
-            string sql = @"SELECT IdPropietario, nombre, apellido, dni, telefono, email, clave 
-                           FROM propietario 
-                           WHERE IdPropietario = @id;";
+            command.Parameters.AddWithValue("@id", id);
 
-            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            connection.Open();
+            using (MySqlDataReader reader = command.ExecuteReader())
             {
-                command.Parameters.AddWithValue("@id", id);
-
-                connection.Open();
-
-                using (MySqlDataReader reader = command.ExecuteReader())
+                if (reader.Read())
                 {
-                    if (reader.Read())
+                    p = new Propietario
                     {
-                        p = new Propietario
-                        {
-                            IdPropietario = reader.GetInt32(
-                                reader.GetOrdinal("IdPropietario")
-                            ),
-                            Nombre = reader.GetString(
-                                reader.GetOrdinal("nombre")
-                            ),
-                            Apellido = reader.GetString(
-                                reader.GetOrdinal("apellido")
-                            ),
-                            Dni = reader.GetString(
-                                reader.GetOrdinal("dni")
-                            ),
-                            Telefono = reader.IsDBNull(
-                                reader.GetOrdinal("telefono")
-                            )
-                                ? null
-                                : reader.GetString(reader.GetOrdinal("telefono")),
-                            Email = reader.IsDBNull(
-                                reader.GetOrdinal("email")
-                            )
-                                ? null
-                                : reader.GetString(reader.GetOrdinal("email")),
-                            Clave = reader.GetString(
-                                reader.GetOrdinal("clave")
-                            )
-                        };
-                    }
+                        IdPropietario = reader.GetInt32(reader.GetOrdinal("id_propietario")),
+                        Nombre = reader.GetString(reader.GetOrdinal("nombre")),
+                        Apellido = reader.GetString(reader.GetOrdinal("apellido")),
+                        Dni = reader.GetString(reader.GetOrdinal("dni")),
+                        Telefono = reader.IsDBNull(reader.GetOrdinal("telefono")) ? null : reader.GetString(reader.GetOrdinal("telefono")),
+                        Email = reader.IsDBNull(reader.GetOrdinal("email")) ? null : reader.GetString(reader.GetOrdinal("email")),
+                        Clave = reader.GetString(reader.GetOrdinal("clave")),
+                        Estado = reader.GetBoolean(reader.GetOrdinal("estado"))
+                    };
                 }
             }
         }
-
-        return p;
     }
+    return p;
+}
+
+public int Reactivar(int id)
+{
+    int res = -1;
+    using (MySqlConnection connection = new MySqlConnection(connectionString))
+    {
+        string sql = @"UPDATE propietario SET estado = TRUE WHERE id_propietario = @id;";
+
+        using (MySqlCommand command = new MySqlCommand(sql, connection))
+        {
+            command.Parameters.AddWithValue("@id", id);
+
+            connection.Open();
+            res = command.ExecuteNonQuery();
+        }
+    }
+    return res;
+}
 }

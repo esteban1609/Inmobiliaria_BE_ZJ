@@ -42,6 +42,7 @@ Conectate a tu servidor MySQL local (Database > New Database Connection > MySQL,
 Abrí un editor SQL nuevo (SQL Editor > New SQL Script).
 Abrí el archivo inmobiliariaDB.sql del repositorio (o pegá su contenido) y ejecutalo completo (Ctrl+Enter o el botón ▶ "Execute SQL Script").
 Verificá en el árbol de la izquierda que se haya creado la base reservas_temporales con las tablas propietario e inquilino cargadas.
+
 Opción 2: Desde la terminal (cliente mysql)
 bash
 mysql -u root -p < inmobiliariaDB.sql
