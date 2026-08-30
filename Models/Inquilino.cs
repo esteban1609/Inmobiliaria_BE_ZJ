@@ -20,6 +20,8 @@ namespace Inmobiliaria_BarrosoEsteban.Models;
 		public string Telefono { get; set; }
 		[Required, EmailAddress]
 		public string Email { get; set; }
+
+		public Boolean Estado{get;set;}=true;
 	}
 
 

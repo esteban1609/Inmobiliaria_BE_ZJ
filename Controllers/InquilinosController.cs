@@ -68,7 +68,6 @@ namespace Inmobiliaria_.Net_Core.Controllers
                 return View(inquilino);
             }
         }
-
         // GET: Inquilinos/Delete/5
         public IActionResult Delete(int id)
         {
@@ -85,5 +84,16 @@ namespace Inmobiliaria_.Net_Core.Controllers
             repositorio.Baja(id);
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        public IActionResult Reactivar(int id)
+        {
+            repositorio.Reactivar(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+
+
+
     }
 }

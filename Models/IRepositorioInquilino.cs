@@ -6,5 +6,6 @@ namespace Inmobiliaria_BarrosoEsteban
     {
         List<Inquilino> Listar();
     	Inquilino ObtenerPorId(int id);
+        int Reactivar(int id);
     }
 }

@@ -47,15 +47,13 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
 
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string sql = @"DELETE FROM inquilino
+            string sql = @"UPDATE FROM inquilino
                            WHERE id_inquilino = @id;";
 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@id", id);
-
                 connection.Open();
-
                 res = command.ExecuteNonQuery();
             }
         }
@@ -101,7 +99,7 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
 
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string sql = @"SELECT id_inquilino, nombre, apellido, dni, telefono, email
+            string sql = @"SELECT id_inquilino, nombre, apellido, dni, telefono, email,estado
                            FROM inquilino;";
 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
@@ -116,24 +114,13 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
                     {
                         Inquilino i = new Inquilino
                         {
-                            IdInquilino = reader.GetInt32(
-                                reader.GetOrdinal("id_inquilino")
-                            ),
-                            Nombre = reader.GetString(
-                                reader.GetOrdinal("nombre")
-                            ),
-                            Apellido = reader.GetString(
-                                reader.GetOrdinal("apellido")
-                            ),
-                            Dni = reader.GetString(
-                                reader.GetOrdinal("dni")
-                            ),
-                            Telefono = reader.GetString(
-                                reader.GetOrdinal("telefono")
-                            ),
-                            Email = reader.GetString(
-                                reader.GetOrdinal("email")
-                            )
+                            IdInquilino = reader.GetInt32(reader.GetOrdinal("id_inquilino")),
+                            Nombre = reader.GetString(reader.GetOrdinal("nombre")),
+                            Apellido = reader.GetString(reader.GetOrdinal("apellido")),
+                            Dni = reader.GetString(reader.GetOrdinal("dni")),
+                            Telefono = reader.GetString(reader.GetOrdinal("telefono")),
+                            Email = reader.GetString(reader.GetOrdinal("email")),
+                            Estado =reader.GetBoolean(reader.GetOrdinal("estado"))
                         };
 
                         lista.Add(i);
@@ -168,24 +155,13 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
                     {
                         i = new Inquilino
                         {
-                            IdInquilino = reader.GetInt32(
-                                reader.GetOrdinal("id_inquilino")
-                            ),
-                            Nombre = reader.GetString(
-                                reader.GetOrdinal("nombre")
-                            ),
-                            Apellido = reader.GetString(
-                                reader.GetOrdinal("apellido")
-                            ),
-                            Dni = reader.GetString(
-                                reader.GetOrdinal("dni")
-                            ),
-                            Telefono = reader.GetString(
-                                reader.GetOrdinal("telefono")
-                            ),
-                            Email = reader.GetString(
-                                reader.GetOrdinal("email")
-                            )
+                            IdInquilino = reader.GetInt32(reader.GetOrdinal("id_inquilino")),
+                            Nombre = reader.GetString(reader.GetOrdinal("nombre")),
+                            Apellido = reader.GetString(reader.GetOrdinal("apellido")),
+                            Dni = reader.GetString(reader.GetOrdinal("dni")),
+                            Telefono = reader.GetString(reader.GetOrdinal("telefono")),
+                            Email = reader.GetString(reader.GetOrdinal("email")),
+                            Estado = reader.GetBoolean(reader.GetOrdinal("estado"))
                         };
                     }
                 }
@@ -194,4 +170,21 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
 
         return i;
     }
+
+    public int Reactivar(int id)
+{
+    int res = -1;
+    using (MySqlConnection connection = new MySqlConnection(connectionString))
+    {
+        string sql = @"UPDATE inquiilino SET estado = TRUE WHERE id_inquilino = @id;";
+
+        using (MySqlCommand command = new MySqlCommand(sql, connection))
+        {
+            command.Parameters.AddWithValue("@id", id);
+            connection.Open();
+            res = command.ExecuteNonQuery();
+        }
+    }
+    return res;
+}
 }
