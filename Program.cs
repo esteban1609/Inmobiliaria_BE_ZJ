@@ -1,4 +1,5 @@
 using Inmobiliaria_BarrosoEsteban;
+using Inmobiliaria_BarrosoEsteban.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,7 @@ builder.Services.AddControllersWithViews();
 // --- INYECCIÓN DE DEPENDENCIAS ---
 builder.Services.AddScoped<IRepositorioInquilino, RepositorioInquilino>();
 builder.Services.AddScoped<IRepositorioPropietario, RepositorioPropietario>();
+builder.Services.AddScoped<IRepositorioInmueble, RepositorioInmueble>();
 // Agrega aquí los demás repositorios que tengas (Inmueble, Pago, Contrato, etc.)
 
 var app = builder.Build();

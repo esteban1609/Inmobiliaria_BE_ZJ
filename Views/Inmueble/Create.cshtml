@@ -1,0 +1,72 @@
+@model Inmobiliaria_BarrosoEsteban.Models.Inmueble
+
+<div class="container mt-4">
+
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body p-4">
+
+                    <h3 class="fw-bold">
+                        Nuevo Inmueble
+                    </h3>
+
+                    <form asp-action="Create" method="post">
+
+                        <div class="mb-3">
+                            <label asp-for="Direccion" class="form-label">
+                            </label>
+
+                            <input asp-for="Direccion" class="form-control" />
+
+                            <span asp-validation-for="Direccion" class="text-danger">
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Cupo" class="form-label">
+                            </label>
+
+                            <input asp-for="Cupo" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PrecioPorDia" class="form-label">
+                            </label>
+
+                            <input asp-for="PrecioPorDia" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PorcentajeReserva" class="form-label">
+                            </label>
+
+                            <input asp-for="PorcentajeReserva" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Propietario
+                            </label>
+
+                            <select asp-for="IdPropietario" class="form-select">
+
+                                <option value="">
+                                    -- Seleccione propietario --
+                                </option>
+
+                                @foreach (var propietario in ViewBag.Propietarios)
+                                {
+                                    <option value="@propietario.IdPropietario">
+                                        @propietario.Nombre @propietario.Apellido
+                                    </option>
+                                }
+
+                            </select>
+
+                        </div>
+
+                    </form>

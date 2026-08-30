@@ -1,0 +1,100 @@
+@model Inmobiliaria_BarrosoEsteban.Models.Inmueble
+
+<div class="container mt-4">
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body p-4">
+
+                    <h3 class="fw-bold mb-4">
+                        Detalle del Inmueble
+                    </h3>
+
+                    <dl class="row">
+
+                        <dt class="col-sm-4">
+                            Dirección
+                        </dt>
+
+                        <dd class="col-sm-8">
+                            @Model.Direccion
+                        </dd>
+
+                        <dt class="col-sm-4">
+                            Cupo
+                        </dt>
+
+                        <dd class="col-sm-8">
+                            @Model.Cupo
+                        </dd>
+
+                        <dt class="col-sm-4">
+                            Precio por día
+                        </dt>
+
+                        <dd class="col-sm-8">
+                            $ @Model.PrecioPorDia
+                        </dd>
+
+                        <dt class="col-sm-4">
+                            Porcentaje de reserva
+                        </dt>
+
+                        <dd class="col-sm-8">
+                            @Model.PorcentajeReserva %
+                        </dd>
+
+                        <dt class="col-sm-4">
+                            Propietario
+                        </dt>
+
+                        <dd class="col-sm-8">
+                            @Model.Propietario?.Nombre
+                            @Model.Propietario?.Apellido
+                        </dd>
+
+                        <dt class="col-sm-4">
+                            Estado
+                        </dt>
+
+                        <dd class="col-sm-8">
+
+                            @if (Model.Estado)
+                            {
+                                <span class="badge bg-success">
+                                    Activo
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">
+                                    Inactivo
+                                </span>
+                            }
+
+                        </dd>
+
+                    </dl>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Volver
+                    </a>
+
+                    <a asp-action="Edit"
+                       asp-route-id="@Model.IdInmueble"
+                       class="btn btn-primary">
+                        Editar
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>

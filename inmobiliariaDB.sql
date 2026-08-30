@@ -64,3 +64,19 @@ INSERT INTO inquilino (dni, nombre, apellido, telefono, email) VALUES
 ('32999000', 'Diego',   'Ramirez',  '2664777888', 'diego.ramirez@mail.com'),
 ('31222333', 'Carla',   'Suarez',   '2664999000', 'carla.suarez@mail.com'),
 ('40123456', 'Nahuel',  'Ortiz',    '2664112233', 'nahuel.ortiz@mail.com');
+
+
+INSERT INTO inmueble
+(direccion, cupo, precio_por_dia, porcentaje_reserva, latitud, longitud, id_propietario, estado)
+VALUES
+('Av. Illia 850', 4, 45000.00, 20.00, -33.3017, -66.3378, 1, TRUE);
+
+INSERT INTO inmueble
+(direccion, cupo, precio_por_dia, porcentaje_reserva, latitud, longitud, id_propietario, estado)
+VALUES
+('San Martín 1250', 6, 65000.00, 25.00, -33.2950, -66.3350, 2, TRUE);
+
+INSERT INTO inmueble
+(direccion, cupo, precio_por_dia, porcentaje_reserva, latitud, longitud, id_propietario, estado)
+VALUES
+('Pringles 420', 3, 38000.00, 15.00, -33.2980, -66.3400, 3, FALSE);
