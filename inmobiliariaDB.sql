@@ -34,6 +34,22 @@ CREATE TABLE inquilino (
     email            VARCHAR(150),
     estado           BOOLEAN NOT NULL DEFAULT TRUE
 );
+
+CREATE TABLE inmueble (
+    id_inmueble INT AUTO_INCREMENT PRIMARY KEY,
+    direccion VARCHAR(150) NOT NULL,
+    cupo INT NOT NULL,
+    precio_por_dia DECIMAL(10,2) NOT NULL,
+    porcentaje_reserva DECIMAL(5,2) NOT NULL,
+    latitud DECIMAL(10,7),
+    longitud DECIMAL(10,7),
+    id_propietario INT NOT NULL,
+    estado BOOLEAN NOT NULL DEFAULT TRUE,
+
+    CONSTRAINT fk_inmueble_propietario
+        FOREIGN KEY (id_propietario)
+        REFERENCES propietario(id_propietario)
+);
  
 -- =========================================================
 -- Datos iniciales de prueba
