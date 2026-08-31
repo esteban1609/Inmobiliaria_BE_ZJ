@@ -18,10 +18,9 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
 
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string sql = @"INSERT INTO inquilino
+            string sql = @"INSERT INTO inmueble
                 	(Direccion, Cupo, PrecioPorDia, PorcentajeReserva, Latitud, Longitud, PropietarioId)
-					VALUES (@direccion, @cupo, @precioPorDia, @porcentajeReserva, @latitud, @longitud, @propietarioId);
-					SELECT SCOPE_IDENTITY();";
+					VALUES (@direccion, @cupo, @precioPorDia, @porcentajeReserva, @latitud, @longitud, @propietarioId);";
 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
@@ -49,8 +48,9 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
 
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string sql = @"UPDATE FROM inmueble
-                           WHERE id_inmueble = @id;";
+        string sql = @"UPDATE inmueble
+                       SET estado = FALSE
+                       WHERE id_inmueble = @id;";
 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {

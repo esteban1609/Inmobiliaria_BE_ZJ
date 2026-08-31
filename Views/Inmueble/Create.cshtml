@@ -12,6 +12,9 @@
                     <h3 class="fw-bold">
                         Nuevo Inmueble
                     </h3>
+                    <p class="text-muted mb-4">
+                        Complete los datos para registrar un nuevo Inmueble.
+                    </p>
 
                     <form asp-action="Create" method="post">
 
@@ -67,6 +70,17 @@
 
                             </select>
 
+                            <div class="d-flex justify-content-end gap-2">
+
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    Volver
+                                </a>
+
+                                <button type="submit" class="btn btn-primary px-4">
+                                    Guardar
+                                </button>
+
+                            </div>
                         </div>
 
                     </form>

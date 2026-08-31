@@ -2,74 +2,97 @@
 
 <table class="table table-hover">
 
-    <thead>
-        <tr>
-            <th>Dirección</th>
-            <th>Cupo</th>
-            <th>Precio por día</th>
-            <th>Propietario</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
+    <div class="container mt-4">
 
-    <tbody>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Inmuebles</h2>
+                <p class="text-muted mb-0">Registre su propio Inmueble</p>
+            </div>
 
-    @foreach (var item in Model)
-    {
-        <tr>
+            <a asp-action="Create" class="btn btn-primary">
+                + Nuevo Inquilino
+            </a>
+        </div>
 
-            <td>
-                @item.Direccion
-            </td>
 
-            <td>
-                @item.Cupo
-            </td>
+        <thead>
+            <tr>
+                <th>Dirección</th>
+                <th>Cupo</th>
+                <th>Precio por día</th>
+                <th>Propietario</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
 
-            <td>
-                $ @item.PrecioPorDia
-            </td>
+        <tbody>
 
-            <td>
-                @item.Propietario?.Nombre
-                @item.Propietario?.Apellido
-            </td>
+            @foreach (var item in Model)
+            {
+                <tr>
 
-            <td>
-                @if (item.Estado)
-                {
-                    <span class="badge bg-success">
-                        Activo
-                    </span>
-                }
-                else
-                {
-                    <span class="badge bg-danger">
-                        Inactivo
-                    </span>
-                }
-            </td>
+                    <td>
+                        @item.Direccion
+                    </td>
 
-            <td>
+                    <td>
+                        @item.Cupo
+                    </td>
 
-                <a asp-action="Details"
-                   asp-route-id="@item.IdInmueble"
-                   class="btn btn-sm btn-outline-info">
-                    Detalles
-                </a>
+                    <td>
+                        $ @item.PrecioPorDia
+                    </td>
 
-                <a asp-action="Edit"
-                   asp-route-id="@item.IdInmueble"
-                   class="btn btn-sm btn-outline-primary">
-                    Editar
-                </a>
+                    <td>
+                        @item.Propietario?.Nombre
+                        @item.Propietario?.Apellido
+                    </td>
 
-            </td>
+                    <td>
+                        @if (item.Estado)
+                        {
+                            <span class="badge bg-success">
+                                Activo
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">
+                                Inactivo
+                            </span>
+                        }
+                    </td>
 
-        </tr>
-    }
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.IdInmueble" class="btn btn-sm btn-outline-info">
+                            Detalles
+                        </a>
 
-    </tbody>
+                        @if (item.Estado)
+                        {
+                            <form asp-action="Delete" asp-route-id="@item.IdInmueble" method="post" style="display:inline">
+
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    Dar de baja
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="Reactivar" asp-route-id="@item.IdInmueble" method="post" style="display:inline">
+
+                                <button type="submit" class="btn btn-sm btn-outline-success">
+                                    Dar de alta
+                                </button>
+                            </form>
+                        }
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
 
 </table>

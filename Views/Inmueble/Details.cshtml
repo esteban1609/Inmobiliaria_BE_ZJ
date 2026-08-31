@@ -56,9 +56,18 @@
                             @Model.Propietario?.Apellido
                         </dd>
 
+                        <dt class="col-sm-4">Latitud</dt>
+                        <dd class="col-sm-8">@Model.Latitud</dd>
+
+                        <dt class="col-sm-4">Longitud</dt>
+                        <dd class="col-sm-8">@Model.Longitud</dd>
+
+
                         <dt class="col-sm-4">
                             Estado
                         </dt>
+
+
 
                         <dd class="col-sm-8">
 
@@ -79,17 +88,15 @@
 
                     </dl>
 
-                    <a asp-action="Index"
-                       class="btn btn-outline-secondary">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
                         Volver
                     </a>
-
-                    <a asp-action="Edit"
-                       asp-route-id="@Model.IdInmueble"
-                       class="btn btn-primary">
+                    @if (Model.Estado)
+                    {
+                    <a asp-action="Edit" asp-route-id="@Model.IdInmueble" class="btn btn-primary">
                         Editar
                     </a>
-
+                    }
                 </div>
 
             </div>
