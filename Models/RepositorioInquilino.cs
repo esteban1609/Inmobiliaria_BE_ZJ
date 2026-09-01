@@ -47,8 +47,7 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
 
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string sql = @"UPDATE FROM inquilino
-                           WHERE id_inquilino = @id;";
+            string sql = @"UPDATE inquilino SET estado = FALSE WHERE id_inquilino = @id;";
 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
@@ -83,6 +82,7 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
                 command.Parameters.AddWithValue("@telefono", i.Telefono);
                 command.Parameters.AddWithValue("@email", i.Email);
                 command.Parameters.AddWithValue("@id", i.IdInquilino);
+                
 
                 connection.Open();
 
@@ -138,7 +138,7 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
 
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string sql = @"SELECT id_inquilino, nombre, apellido, dni, telefono, email
+            string sql = @"SELECT id_inquilino, nombre, apellido, dni, telefono, email, estado
                            FROM inquilino
                            WHERE id_inquilino = @id;";
 
@@ -176,7 +176,7 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
     int res = -1;
     using (MySqlConnection connection = new MySqlConnection(connectionString))
     {
-        string sql = @"UPDATE inquiilino SET estado = TRUE WHERE id_inquilino = @id;";
+        string sql = @"UPDATE inquilino SET estado = TRUE WHERE id_inquilino = @id;";
 
         using (MySqlCommand command = new MySqlCommand(sql, connection))
         {
