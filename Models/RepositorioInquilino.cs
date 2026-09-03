@@ -138,7 +138,7 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
 
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string sql = @"SELECT id_inquilino, nombre, apellido, dni, telefono, email
+            string sql = @"SELECT id_inquilino, nombre, apellido, dni, telefono, email,estado
                            FROM inquilino
                            WHERE id_inquilino = @id;";
 

@@ -1,0 +1,21 @@
+@model Reserva
+
+<h1>Eliminar Reserva</h1>
+
+<p>¿Confirmás que querés dar de baja esta reserva?</p>
+
+<dl class="row">
+    <dt class="col-sm-3">Inquilino</dt>
+    <dd class="col-sm-9">@Model.NombreInquilino</dd>
+    <dt class="col-sm-3">Inmueble</dt>
+    <dd class="col-sm-9">@Model.DireccionInmueble</dd>
+    <dt class="col-sm-3">Desde</dt>
+    <dd class="col-sm-9">@Model.FechaDesde.ToShortDateString()</dd>
+    <dt class="col-sm-3">Hasta</dt>
+    <dd class="col-sm-9">@Model.FechaHasta.ToShortDateString()</dd>
+</dl>
+
+<form asp-action="Delete" asp-route-id="@Model.IdReserva" method="post">
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

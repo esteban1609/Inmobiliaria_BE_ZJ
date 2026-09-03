@@ -1,0 +1,54 @@
+@model IEnumerable<Reserva>
+
+<h1>Reservas</h1>
+
+<p><a asp-action="Create">Nueva Reserva</a></p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Inquilino</th>
+            <th>Inmueble</th>
+            <th>Monto/día</th>
+            <th>Desde</th>
+            <th>Hasta</th>
+            <th>Estado</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="@(item.Estado ? "" : "table-secondary text-muted")">
+                <td>@item.NombreInquilino</td>
+                <td>@item.DireccionInmueble</td>
+                <td>@item.MontoDia.ToString("C")</td>
+                <td>@item.FechaDesde.ToShortDateString()</td>
+                <td>@item.FechaHasta.ToShortDateString()</td>
+                <td>
+                    @if (item.Estado)
+                    {
+                        <span class="badge bg-success">Activa</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Inactiva</span>
+                    }
+                </td>
+                <td>
+                    @if (item.Estado)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.IdReserva">Editar</a> 
+                        <a asp-action="Delete" asp-route-id="@item.IdReserva">Eliminar</a>
+                    }
+                    else
+                    {
+                        <form asp-action="Reactivar" asp-route-id="@item.IdReserva" method="post" style="display:inline">
+                            <button type="submit" class="btn btn-link p-0">Reactivar</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

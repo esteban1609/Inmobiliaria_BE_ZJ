@@ -8,9 +8,9 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
     {
         private readonly IRepositorioPropietario repositorio;
 
-        public PropietarioController(IConfiguration configuration)
+        public PropietarioController(IRepositorioPropietario repositorio)
         {
-            repositorio = new RepositorioPropietario(configuration);
+            this.repositorio = repositorio;
         }
 
         // GET: Propietario
@@ -28,10 +28,23 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         // POST: Propietario/Create
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(Propietario p)
         {
-            repositorio.Alta(p);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    repositorio.Alta(p);
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Ocurrió un error al guardar: " + ex.Message);
+            }
+
+            return View(p);
         }
 
         // GET: Propietario/Edit/5
@@ -44,11 +57,25 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         // POST: Propietario/Edit/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Propietario p)
         {
-            p.IdPropietario = id;
-            repositorio.Modificacion(p);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                p.IdPropietario = id;
+
+                if (ModelState.IsValid)
+                {
+                    repositorio.Modificacion(p);
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Ocurrió un error al modificar: " + ex.Message);
+            }
+
+            return View(p);
         }
 
         // GET: Propietario/Delete/5
@@ -61,16 +88,35 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         // POST: Propietario/Delete/5
         [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            repositorio.Baja(id);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                repositorio.Baja(id);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "No se pudo eliminar el propietario: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
+        // POST: Propietario/Reactivar/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Reactivar(int id)
         {
-            repositorio.Reactivar(id);
+            try
+            {
+                repositorio.Reactivar(id);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "No se pudo reactivar el propietario: " + ex.Message;
+            }
+
             return RedirectToAction(nameof(Index));
         }
     }
