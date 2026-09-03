@@ -1,19 +1,22 @@
 -- =========================================================
 -- Reservas Temporales - Script de creación e inicialización
 -- Motor: MySQL
--- Entrega 1: Propietario e Inquilino
+-- Entrega Completa: Propietario, Inquilino, Inmuebles y Reserva
 -- =========================================================
- 
+
 CREATE DATABASE IF NOT EXISTS reservas_temporales;
 USE reservas_temporales;
- 
-DROP TABLE IF EXISTS propietario;
+
+-- Eliminar tablas en orden inverso a las dependencias de FK
+DROP TABLE IF EXISTS reserva;
+DROP TABLE IF EXISTS inmuebles;
 DROP TABLE IF EXISTS inquilino;
- 
+DROP TABLE IF EXISTS propietario;
+
 -- =========================================================
 -- Creación de tablas
 -- =========================================================
- 
+
 CREATE TABLE propietario (
     id_propietario   INT AUTO_INCREMENT PRIMARY KEY,
     dni              VARCHAR(15) NOT NULL UNIQUE,
@@ -24,7 +27,7 @@ CREATE TABLE propietario (
     clave            VARCHAR(100) NOT NULL,
     estado           BOOLEAN NOT NULL DEFAULT TRUE
 );
- 
+
 CREATE TABLE inquilino (
     id_inquilino     INT AUTO_INCREMENT PRIMARY KEY,
     dni              VARCHAR(15) NOT NULL UNIQUE,
@@ -35,48 +38,69 @@ CREATE TABLE inquilino (
     estado           BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-CREATE TABLE inmueble (
-    id_inmueble INT AUTO_INCREMENT PRIMARY KEY,
-    direccion VARCHAR(150) NOT NULL,
-    cupo INT NOT NULL,
-    precio_por_dia DECIMAL(10,2) NOT NULL,
-    porcentaje_reserva DECIMAL(5,2) NOT NULL,
-    latitud DECIMAL(10,7),
-    longitud DECIMAL(10,7),
-    id_propietario INT NOT NULL,
-    estado BOOLEAN NOT NULL DEFAULT TRUE,
+CREATE TABLE inmuebles (
+    id_inmueble         INT AUTO_INCREMENT PRIMARY KEY,
+    direccion           VARCHAR(150) NOT NULL,
+    cupo                INT NOT NULL,
+    precio_por_dia      DECIMAL(10,2) NOT NULL,
+    porcentaje_reserva  DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    latitud             DECIMAL(10,7),
+    longitud            DECIMAL(10,7),
+    id_propietario      INT NOT NULL,
+    estado              BOOLEAN NOT NULL DEFAULT TRUE,
 
     CONSTRAINT fk_inmueble_propietario
         FOREIGN KEY (id_propietario)
         REFERENCES propietario(id_propietario)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE
 );
- 
+
+CREATE TABLE reserva (
+    id_reserva          INT AUTO_INCREMENT PRIMARY KEY,
+    id_inquilino        INT NOT NULL,
+    id_inmueble         INT NOT NULL,
+    monto_dia           DECIMAL(10,2) NOT NULL,
+    fecha_desde         DATETIME NOT NULL,
+    fecha_hasta         DATETIME NOT NULL,
+    estado              BOOLEAN NOT NULL DEFAULT TRUE,
+
+    CONSTRAINT fk_reserva_inquilino
+        FOREIGN KEY (id_inquilino)
+        REFERENCES inquilino(id_inquilino)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_reserva_inmueble
+        FOREIGN KEY (id_inmueble)
+        REFERENCES inmuebles(id_inmueble)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE
+);
+
 -- =========================================================
 -- Datos iniciales de prueba
 -- =========================================================
- 
+
 INSERT INTO propietario (dni, nombre, apellido, telefono, email, clave) VALUES
 ('30111222', 'Marta',   'Gonzalez', '2664111222', 'marta.gonzalez@mail.com', '1234'),
 ('28555666', 'Ricardo', 'Fernandez', '2664333444', 'ricardo.fernandez@mail.com', '1234'),
 ('35777888', 'Lucia',   'Torres',   '2664555666', 'lucia.torres@mail.com', '1234');
- 
+
 INSERT INTO inquilino (dni, nombre, apellido, telefono, email) VALUES
 ('32999000', 'Diego',   'Ramirez',  '2664777888', 'diego.ramirez@mail.com'),
 ('31222333', 'Carla',   'Suarez',   '2664999000', 'carla.suarez@mail.com'),
 ('40123456', 'Nahuel',  'Ortiz',    '2664112233', 'nahuel.ortiz@mail.com');
 
-
-INSERT INTO inmueble
-(direccion, cupo, precio_por_dia, porcentaje_reserva, latitud, longitud, id_propietario, estado)
+INSERT INTO inmuebles 
+(direccion, cupo, precio_por_dia, porcentaje_reserva, latitud, longitud, id_propietario, estado) 
 VALUES
-('Av. Illia 850', 4, 45000.00, 20.00, -33.3017, -66.3378, 1, TRUE);
+('Av. Illia 850', 4, 45000.00, 20.00, -33.3017000, -66.3378000, 1, TRUE),
+('San Martín 1250', 6, 65000.00, 25.00, -33.2950000, -66.3350000, 2, TRUE),
+('Pringles 420', 3, 38000.00, 15.00, -33.2980000, -66.3400000, 3, FALSE);
 
-INSERT INTO inmueble
-(direccion, cupo, precio_por_dia, porcentaje_reserva, latitud, longitud, id_propietario, estado)
+INSERT INTO reserva 
+(id_inquilino, id_inmueble, monto_dia, fecha_desde, fecha_hasta, estado) 
 VALUES
-('San Martín 1250', 6, 65000.00, 25.00, -33.2950, -66.3350, 2, TRUE);
-
-INSERT INTO inmueble
-(direccion, cupo, precio_por_dia, porcentaje_reserva, latitud, longitud, id_propietario, estado)
-VALUES
-('Pringles 420', 3, 38000.00, 15.00, -33.2980, -66.3400, 3, FALSE);
+(1, 1, 45000.00, '2026-10-01 12:00:00', '2026-10-07 10:00:00', TRUE),
+(2, 2, 65000.00, '2026-11-15 12:00:00', '2026-11-20 10:00:00', TRUE);
