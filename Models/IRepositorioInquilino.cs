@@ -5,7 +5,7 @@ namespace Inmobiliaria_BarrosoEsteban
     public interface IRepositorioInquilino : IRepositorio<Inquilino>
     {
         List<Inquilino> Listar();
-    	Inquilino ObtenerPorId(int id);
+    	Inquilino? ObtenerPorId(int id);
         int Reactivar(int id);
     }
 }
