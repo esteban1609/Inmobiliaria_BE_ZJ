@@ -38,13 +38,18 @@
                 <td>
                     @if (item.Estado)
                     {
-                        <a asp-action="Edit" asp-route-id="@item.IdReserva">Editar</a> 
-                        <a asp-action="Delete" asp-route-id="@item.IdReserva">Eliminar</a>
+                        <a asp-action="Edit" asp-route-id="@item.IdReserva"
+                            class="btn btn-sm btn-outline-primary me-2">
+                            Editar
+                        </a>
+                        <form asp-action="Delete" asp-route-id="@item.IdReserva" method="post" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Dar de Baja</button>
+                        </form>
                     }
                     else
                     {
                         <form asp-action="Reactivar" asp-route-id="@item.IdReserva" method="post" style="display:inline">
-                            <button type="submit" class="btn btn-link p-0">Reactivar</button>
+                            <button type="submit" class="btn btn-sm btn-outline-success">Reactivar</button>
                         </form>
                     }
                 </td>

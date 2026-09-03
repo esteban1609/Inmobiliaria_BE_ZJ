@@ -73,9 +73,9 @@ CREATE TABLE reserva (
 
     CONSTRAINT fk_reserva_inmueble
         FOREIGN KEY (id_inmueble)
-        REFERENCES inmuebles(id_inmueble)
+        REFERENCES inmueble(id_inmueble)
         ON DELETE RESTRICT
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
 );
 
 -- =========================================================
