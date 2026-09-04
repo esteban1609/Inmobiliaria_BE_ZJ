@@ -31,8 +31,10 @@ namespace Inmobiliaria_BarrosoEsteban.Models
 
 		public TipoInmueble? TipoInmueble { get; set; }
 
+[Range(-90, 90, ErrorMessage = "La latitud debe estar entre -90 y 90")]
 		public decimal Latitud { get; set; }
-
+		
+[Range(-180, 180, ErrorMessage = "La longitud debe estar entre -180 y 180")]
 		public decimal Longitud { get; set; }
 
 		// FK del propietario

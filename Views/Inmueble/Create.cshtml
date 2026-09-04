@@ -17,7 +17,7 @@
                     </p>
 
                     <form asp-action="Create" method="post">
-                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                        <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
                         <div class="mb-3">
                             <label asp-for="id_tipo" class="form-label">
@@ -42,9 +42,6 @@
                             <span asp-validation-for="TipoInmueble" class="text-danger">
                             </span>
                         </div>
-
-
-
 
                         <div class="mb-3">
                             <label asp-for="Direccion" class="form-label">
@@ -75,6 +72,29 @@
                             </label>
 
                             <input asp-for="PorcentajeReserva" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Latitud" class="form-label">
+                                Latitud
+                            </label>
+                            
+                            <input asp-for="Latitud" class="form-control" placeholder="Ej: -33,2980000" />
+
+                            
+                            <span asp-validation-for="Latitud" class="text-danger"></span>
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Longitud" class="form-label">
+                                Longitud
+                            </label>
+
+                            <input asp-for="Longitud" class="form-control" placeholder="Ej: -66,3400000" />
+
+                            <span asp-validation-for="Longitud" class="text-danger"></span>
+                            </span>
                         </div>
 
                         <div class="mb-3">

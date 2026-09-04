@@ -61,7 +61,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
                 return NotFound();
             }
             ViewBag.Propietarios = repoPropietario.Listar();
-
+            ViewBag.TiposInmueble = repoTipoInmueble.Listar();
             return View(inmueble);
         }
 
@@ -77,6 +77,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Propietarios = repoPropietario.Listar();
+            ViewBag.TiposInmueble = repoTipoInmueble.Listar();
             return View(i);
         }
 

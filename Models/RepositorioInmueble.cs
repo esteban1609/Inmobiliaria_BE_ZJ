@@ -83,36 +83,42 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         return res;
     }
 
-    public int Modificacion(Inmueble i)
+public int Modificacion(Inmueble i)
+{
+    int res = -1;
+
+    using (MySqlConnection connection = new MySqlConnection(connectionString))
     {
-        int res = -1;
+        string sql = @"UPDATE inmueble SET
+                        direccion = @direccion,
+                        cupo = @cupo,
+                        precio_por_dia = @precioPorDia,
+                        porcentaje_reserva = @porcentajeReserva,
+                        latitud = @latitud,
+                        longitud = @longitud,
+                        id_propietario = @propietarioId,
+                        id_tipo = @tipoId
+                       WHERE id_inmueble = @id;";
 
-        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        using (MySqlCommand command = new MySqlCommand(sql, connection))
         {
-            string sql = @"UPDATE inmueble SET
-						Direccion=@direccion, Cupo=@cupo, PrecioPorDia=@precioPorDia, PorcentajeReserva=@porcentajeReserva, 
-						Latitud=@latitud, Longitud=@longitud, PropietarioId=@propietarioId , id_tipo=@tipoid
-                WHERE id_inmueble = @id;";
+            command.Parameters.AddWithValue("@direccion", i.Direccion);
+            command.Parameters.AddWithValue("@cupo", i.Cupo);
+            command.Parameters.AddWithValue("@precioPorDia", i.PrecioPorDia);
+            command.Parameters.AddWithValue("@porcentajeReserva", i.PorcentajeReserva);
+            command.Parameters.AddWithValue("@latitud", i.Latitud);
+            command.Parameters.AddWithValue("@longitud", i.Longitud);
+            command.Parameters.AddWithValue("@propietarioId", i.IdPropietario);
+            command.Parameters.AddWithValue("@tipoId", i.id_tipo);
+            command.Parameters.AddWithValue("@id", i.IdInmueble);
 
-            using (MySqlCommand command = new MySqlCommand(sql, connection))
-            {
-                command.Parameters.AddWithValue("@direccion", i.Direccion);
-                command.Parameters.AddWithValue("@cupo", i.Cupo);
-                command.Parameters.AddWithValue("@precioPorDia", i.PrecioPorDia);
-                command.Parameters.AddWithValue("@porcentajeReserva", i.PorcentajeReserva);
-                command.Parameters.AddWithValue("@latitud", i.Latitud);
-                command.Parameters.AddWithValue("@longitud", i.Longitud);
-                command.Parameters.AddWithValue("@propietarioId", i.IdPropietario);
-                command.Parameters.AddWithValue("@id", i.IdInmueble);
-                command.Parameters.AddWithValue("@tipoId", i.id_tipo);
-                connection.Open();
-                res = command.ExecuteNonQuery();
-                connection.Close();
-            }
+            connection.Open();
+            res = command.ExecuteNonQuery();
         }
-
-        return res;
     }
+
+    return res;
+}
 
 
 
