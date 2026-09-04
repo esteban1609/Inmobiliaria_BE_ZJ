@@ -1,23 +1,23 @@
 @model IEnumerable<Inmobiliaria_BarrosoEsteban.Models.Inmueble>
 
-<table class="table table-hover">
+<div class="container mt-4">
 
-    <div class="container mt-4">
-
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2 class="fw-bold mb-1">Inmuebles</h2>
-                <p class="text-muted mb-0">Registre su propio Inmueble</p>
-            </div>
-
-            <a asp-action="Create" class="btn btn-primary">
-                + Nuevo Inquilino
-            </a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Inmuebles</h2>
+            <p class="text-muted mb-0">Registre su propio Inmueble</p>
         </div>
 
+        <a asp-action="Create" class="btn btn-primary">
+            + Nuevo Inmueble
+        </a>
+    </div>
+
+    <table class="table table-hover">
 
         <thead>
             <tr>
+                <th>Tipo de inmueble</th>
                 <th>Dirección</th>
                 <th>Cupo</th>
                 <th>Precio por día</th>
@@ -32,6 +32,10 @@
             @foreach (var item in Model)
             {
                 <tr>
+
+                    <td>
+                        @item.TipoInmueble?.Nombre
+                    </td>
 
                     <td>
                         @item.Direccion
@@ -66,24 +70,40 @@
                     </td>
 
                     <td>
-                        <a asp-action="Details" asp-route-id="@item.IdInmueble" class="btn btn-sm btn-outline-info">
+                        <a asp-action="Details"
+                           asp-route-id="@item.IdInmueble"
+                           class="btn btn-sm btn-outline-info">
                             Detalles
                         </a>
 
                         @if (item.Estado)
                         {
-                            <form asp-action="Delete" asp-route-id="@item.IdInmueble" method="post" style="display:inline">
+                            <a asp-action="Edit"
+                               asp-route-id="@item.IdInmueble"
+                               class="btn btn-sm btn-outline-primary">
+                                Editar
+                            </a>
 
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <form asp-action="Delete"
+                                  asp-route-id="@item.IdInmueble"
+                                  method="post"
+                                  style="display:inline">
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-danger">
                                     Dar de baja
                                 </button>
                             </form>
                         }
                         else
                         {
-                            <form asp-action="Reactivar" asp-route-id="@item.IdInmueble" method="post" style="display:inline">
+                            <form asp-action="Reactivar"
+                                  asp-route-id="@item.IdInmueble"
+                                  method="post"
+                                  style="display:inline">
 
-                                <button type="submit" class="btn btn-sm btn-outline-success">
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-success">
                                     Dar de alta
                                 </button>
                             </form>
@@ -95,4 +115,6 @@
 
         </tbody>
 
-</table>
+    </table>
+
+</div>

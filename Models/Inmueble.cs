@@ -27,6 +27,10 @@ namespace Inmobiliaria_BarrosoEsteban.Models
 		[Range(0, 100)]
 		public decimal PorcentajeReserva { get; set; }
 
+		public int id_tipo {get;set;}
+
+		public TipoInmueble? TipoInmueble { get; set; }
+
 		public decimal Latitud { get; set; }
 
 		public decimal Longitud { get; set; }

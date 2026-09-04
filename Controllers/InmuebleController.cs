@@ -11,11 +11,13 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         private readonly IRepositorioInmueble repositorio;
         private readonly IRepositorioPropietario repoPropietario;
+        private readonly IRepositorioTipoInmueble repoTipoInmueble;
 
-        public InmuebleController(IRepositorioInmueble repositorio, IRepositorioPropietario repoPropietario)
+        public InmuebleController(IRepositorioInmueble repositorio, IRepositorioPropietario repoPropietario, IRepositorioTipoInmueble repositorioTipoInmueble)
         {
             this.repositorio = repositorio;
             this.repoPropietario = repoPropietario;
+            this.repoTipoInmueble = repositorioTipoInmueble;
         }
 
         // LISTADO
@@ -29,6 +31,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
         public IActionResult Create()
         {
             ViewBag.Propietarios = repoPropietario.Listar();
+            ViewBag.TiposInmueble = repoTipoInmueble.Listar();
             return View();
         }
 
@@ -44,6 +47,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Propietarios = repoPropietario.Listar();
+            ViewBag.TiposInmueble = repoTipoInmueble.Listar();
             return View(inmueble);
         }
 

@@ -19,8 +19,8 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             string sql = @"INSERT INTO inmueble
-                	(Direccion, Cupo, PrecioPorDia, PorcentajeReserva, Latitud, Longitud, PropietarioId)
-					VALUES (@direccion, @cupo, @precioPorDia, @porcentajeReserva, @latitud, @longitud, @propietarioId);";
+                	(Direccion, Cupo, Precio_Por_Dia, Porcentaje_Reserva, Latitud, Longitud, id_propietario, id_tipo)
+					VALUES (@direccion, @cupo, @precioPorDia, @porcentajeReserva, @latitud, @longitud, @propietarioId, @tipo);";
 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
@@ -31,6 +31,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
                 command.Parameters.AddWithValue("@latitud", i.Latitud);
                 command.Parameters.AddWithValue("@longitud", i.Longitud);
                 command.Parameters.AddWithValue("@propietarioId", i.IdPropietario);
+                command.Parameters.AddWithValue("@tipo", i.id_tipo);
                 connection.Open();
                 command.ExecuteNonQuery();
                 res = Convert.ToInt32(command.LastInsertedId);
@@ -48,7 +49,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
 
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-        string sql = @"UPDATE inmueble
+            string sql = @"UPDATE inmueble
                        SET estado = FALSE
                        WHERE id_inmueble = @id;";
 
@@ -90,7 +91,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         {
             string sql = @"UPDATE inmueble SET
 						Direccion=@direccion, Cupo=@cupo, PrecioPorDia=@precioPorDia, PorcentajeReserva=@porcentajeReserva, 
-						Latitud=@latitud, Longitud=@longitud, PropietarioId=@propietarioId
+						Latitud=@latitud, Longitud=@longitud, PropietarioId=@propietarioId , id_tipo=@tipoid
                 WHERE id_inmueble = @id;";
 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
@@ -103,6 +104,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
                 command.Parameters.AddWithValue("@longitud", i.Longitud);
                 command.Parameters.AddWithValue("@propietarioId", i.IdPropietario);
                 command.Parameters.AddWithValue("@id", i.IdInmueble);
+                command.Parameters.AddWithValue("@tipoId", i.id_tipo);
                 connection.Open();
                 res = command.ExecuteNonQuery();
                 connection.Close();
@@ -131,11 +133,18 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
             i.longitud,
             i.id_propietario,
             i.estado,
-            p.nombre,
-            p.apellido
+            i.id_tipo,
+            p.nombre AS propietario_nombre,
+            p.apellido AS propietario_apellido,
+            t.Nombre AS tipo_nombre
         FROM inmueble i
+
         INNER JOIN propietario p
             ON i.id_propietario = p.id_propietario
+
+        INNER JOIN TipoInmueble t
+            ON i.id_tipo = t.id_tipo
+
         WHERE i.id_inmueble = @id";
 
         using var command =
@@ -163,9 +172,15 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
                 Propietario = new Propietario
                 {
                     IdPropietario = reader.GetInt32("id_propietario"),
-                    Nombre = reader.GetString("nombre"),
-                    Apellido = reader.GetString("apellido")
+                    Nombre = reader.GetString("propietario_nombre"),
+                    Apellido = reader.GetString("propietario_apellido")
+                },
+                TipoInmueble = new TipoInmueble
+                {
+                    id_tipo = reader.GetInt32("id_tipo"),
+                    Nombre = reader.GetString("tipo_nombre")
                 }
+
             };
         }
 
@@ -191,11 +206,18 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
                     i.longitud,
                     i.id_propietario,
                     i.estado,
-                    p.nombre,
-                    p.apellido
+                    i.id_tipo,
+                    p.nombre AS propietario_nombre,
+                    p.apellido AS propietario_apellido,
+                    t.Nombre AS tipo_nombre
                 FROM inmueble i
+
                 INNER JOIN propietario p
                     ON i.id_propietario = p.id_propietario
+                    
+                INNER JOIN TipoInmueble t
+                    ON i.id_tipo = t.id_tipo
+
                 ORDER BY i.id_inmueble";
 
         using var command = new MySqlCommand(sql, connection);
@@ -214,11 +236,17 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
                 Longitud = reader.GetDecimal("longitud"),
                 IdPropietario = reader.GetInt32("id_propietario"),
                 Estado = reader.GetBoolean("estado"),
+                id_tipo = reader.GetInt32("id_tipo"),
                 Propietario = new Propietario
                 {
                     IdPropietario = reader.GetInt32("id_propietario"),
-                    Nombre = reader.GetString("nombre"),
-                    Apellido = reader.GetString("apellido")
+                    Nombre = reader.GetString("propietario_nombre"),
+                    Apellido = reader.GetString("propietario_apellido")
+                },
+                TipoInmueble = new TipoInmueble
+                {
+                    id_tipo = reader.GetInt32("id_tipo"),
+                    Nombre = reader.GetString("tipo_nombre")
                 }
             };
 

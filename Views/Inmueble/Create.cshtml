@@ -17,6 +17,34 @@
                     </p>
 
                     <form asp-action="Create" method="post">
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="id_tipo" class="form-label">
+                                Tipo de Inmueble
+                            </label>
+
+                            <select asp-for="id_tipo" class="form-select">
+
+                                <option value="">
+                                    -- Seleccione un tipo --
+                                </option>
+
+                                @foreach (var tipo in ViewBag.TiposInmueble)
+                                {
+                                    <option value="@tipo.id_tipo">
+                                        @tipo.Nombre
+                                    </option>
+                                }
+
+                            </select>
+
+                            <span asp-validation-for="TipoInmueble" class="text-danger">
+                            </span>
+                        </div>
+
+
+
 
                         <div class="mb-3">
                             <label asp-for="Direccion" class="form-label">

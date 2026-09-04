@@ -47,6 +47,7 @@ CREATE TABLE inmuebles (
     latitud             DECIMAL(10,7),
     longitud            DECIMAL(10,7),
     id_propietario      INT NOT NULL,
+    id_tipo INT NOT NULL,
     estado              BOOLEAN NOT NULL DEFAULT TRUE,
 
     CONSTRAINT fk_inmueble_propietario
@@ -54,6 +55,12 @@ CREATE TABLE inmuebles (
         REFERENCES propietario(id_propietario)
         ON DELETE RESTRICT
         ON UPDATE CASCADE
+
+    CONSTRAINT fk_inmueble_tipo
+        FOREIGN KEY (id_tipo)
+        REFERENCES tipoinmueble(id_tipo)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE    
 );
 
 CREATE TABLE reserva (
@@ -78,6 +85,13 @@ CREATE TABLE reserva (
         ON UPDATE CASCADE,
 );
 
+
+CREATE TABLE TipoInmueble (
+    id_tipo INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre VARCHAR(100) NOT NULL,
+    Estado BOOLEAN NOT NULL DEFAULT TRUE
+);
+
 -- =========================================================
 -- Datos iniciales de prueba
 -- =========================================================
@@ -92,15 +106,23 @@ INSERT INTO inquilino (dni, nombre, apellido, telefono, email) VALUES
 ('31222333', 'Carla',   'Suarez',   '2664999000', 'carla.suarez@mail.com'),
 ('40123456', 'Nahuel',  'Ortiz',    '2664112233', 'nahuel.ortiz@mail.com');
 
-INSERT INTO inmuebles 
-(direccion, cupo, precio_por_dia, porcentaje_reserva, latitud, longitud, id_propietario, estado) 
+INSERT INTO inmueble
+(direccion, cupo, precio_por_dia, porcentaje_reserva, latitud, longitud, id_propietario, id_tipo, estado)
 VALUES
-('Av. Illia 850', 4, 45000.00, 20.00, -33.3017000, -66.3378000, 1, TRUE),
-('San Martín 1250', 6, 65000.00, 25.00, -33.2950000, -66.3350000, 2, TRUE),
-('Pringles 420', 3, 38000.00, 15.00, -33.2980000, -66.3400000, 3, FALSE);
+('Pringles 420', 3, 38000.00, 15.00, -33.2980000, -66.3400000, 3, 2, TRUE),
+('San Martín 1250', 6, 65000.00, 25.00, -33.2950000, -66.3350000, 2, 1, TRUE),
+('Av. Illia 850', 4, 45000.00, 20.00, -33.3017000, -66.3378000, 1, 3, TRUE);
 
 INSERT INTO reserva 
 (id_inquilino, id_inmueble, monto_dia, fecha_desde, fecha_hasta, estado) 
 VALUES
 (1, 1, 45000.00, '2026-10-01 12:00:00', '2026-10-07 10:00:00', TRUE),
 (2, 2, 65000.00, '2026-11-15 12:00:00', '2026-11-20 10:00:00', TRUE);
+
+
+INSERT INTO TipoInmueble (Nombre, Estado)
+VALUES
+('Casa', TRUE),
+('Departamento', TRUE),
+('Local Comercial', TRUE),
+('Terreno', TRUE);
