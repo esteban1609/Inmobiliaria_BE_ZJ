@@ -11,14 +11,15 @@ namespace Inmobiliaria_BarrosoEsteban.Models;
 		[Key]
 		[Display(Name = "Código")]
 		public int IdInquilino { get; set; }
-		[Required]
+		[Required(ErrorMessage = "El nombre es obligatorio")]
 		public string Nombre { get; set; }
-		[Required]
+		[Required(ErrorMessage = "El apellido es obligatorio")]
 		public string Apellido { get; set; }
-		[Required]
+		[Required(ErrorMessage = "El DNI es obligatorio")]
 		public string Dni { get; set; }
 		public string Telefono { get; set; }
-		[Required, EmailAddress]
+		[Required(ErrorMessage = "El mail es obligatorio")]
+		[EmailAddress]
 		public string Email { get; set; }
 
 		public Boolean Estado{get;set;}=true;
