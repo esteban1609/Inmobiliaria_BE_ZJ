@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = "Cambiar contraseña";
+}
+
+<h1>Cambiar contraseña</h1>
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<form asp-action="CambiarClave" method="post">
+    <div class="mb-3">
+        <label>Contraseña actual</label>
+        <input name="claveActual" class="form-control" type="password" required />
+    </div>
+
+    <div class="mb-3">
+        <label>Nueva contraseña</label>
+        <input name="claveNueva" class="form-control" type="password" required minlength="6" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Cambiar</button>
+    <a asp-action="MiPerfil" class="btn btn-secondary">Cancelar</a>
+</form>

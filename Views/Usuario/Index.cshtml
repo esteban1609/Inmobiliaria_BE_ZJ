@@ -1,17 +1,16 @@
-@model IEnumerable<Propietario>
+@model IEnumerable<Usuario>
 
-<h1>Propietarios</h1>
+<h1>Usuarios</h1>
 
-<p><a asp-action="Create" class="btn btn-primary">Nuevo Propietario</a></p>
+<p><a asp-action="Create" class="btn btn-primary">Nuevo Usuario</a></p>
 
 <table class="table">
     <thead>
         <tr>
-            <th>DNI</th>
             <th>Nombre</th>
             <th>Apellido</th>
-            <th>Teléfono</th>
             <th>Email</th>
+            <th>Rol</th>
             <th>Estado</th>
             <th></th>
         </tr>
@@ -20,11 +19,10 @@
         @foreach (var item in Model)
         {
             <tr class="@(item.Estado ? "" : "table-secondary text-muted")">
-                <td>@item.Dni</td>
                 <td>@item.Nombre</td>
                 <td>@item.Apellido</td>
-                <td>@item.Telefono</td>
                 <td>@item.Email</td>
+                <td><span class="badge bg-info text-dark">@item.Rol</span></td>
                 <td>
                     @if (item.Estado)
                     {
@@ -38,17 +36,17 @@
                 <td>
                     @if (item.Estado)
                     {
-                        <a asp-action="Edit" asp-route-id="@item.IdPropietario"
+                        <a asp-action="Edit" asp-route-id="@item.IdUsuario"
                             class="btn btn-sm btn-outline-primary me-2">
                             Editar
                         </a>
-                        <form asp-action="Delete" asp-route-id="@item.IdPropietario" method="post" style="display:inline">
+                        <form asp-action="Delete" asp-route-id="@item.IdUsuario" method="post" style="display:inline">
                             <button type="submit" class="btn btn-sm btn-outline-danger">Dar de baja</button>
                         </form>
                     }
                     else
                     {
-                        <form asp-action="Reactivar" asp-route-id="@item.IdPropietario" method="post" style="display:inline">
+                        <form asp-action="Reactivar" asp-route-id="@item.IdUsuario" method="post" style="display:inline">
                             <button type="submit" class="btn btn-sm btn-outline-success">Reactivar</button>
                         </form>
                     }

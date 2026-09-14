@@ -1,0 +1,33 @@
+@model Usuario
+
+<h1>Mi Perfil</h1>
+
+<form asp-action="MiPerfil" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Nombre"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Apellido"></label>
+        <input asp-for="Apellido" class="form-control" />
+        <span asp-validation-for="Apellido" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Email</label>
+        <input value="@Model.Email" class="form-control" disabled />
+        <small class="text-muted">El email no se puede modificar desde acá.</small>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Avatar"></label>
+        <input asp-for="Avatar" class="form-control" placeholder="URL o nombre de archivo del avatar" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    <a asp-action="CambiarClave" class="btn btn-outline-secondary">Cambiar contraseña</a>
+</form>

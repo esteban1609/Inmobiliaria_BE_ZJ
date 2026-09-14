@@ -71,7 +71,7 @@ public class RepositorioPropietario : RepositorioBase, IRepositorioPropietario
                 telefono = @telefono,
                 email = @email,
                 clave = @clave
-                WHERE IdPropietario = @id;";
+                WHERE Id_Propietario = @id;";
 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
