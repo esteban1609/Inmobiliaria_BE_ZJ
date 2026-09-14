@@ -36,6 +36,10 @@
                     }
                 </td>
                 <td>
+                    <a asp-action="Details" asp-route-id="@item.IdReserva"
+                        class="btn btn-sm btn-outline-secondary me-2">
+                        Ver
+                    </a>
                     @if (item.Estado)
                     {
                         <a asp-action="Edit" asp-route-id="@item.IdReserva"

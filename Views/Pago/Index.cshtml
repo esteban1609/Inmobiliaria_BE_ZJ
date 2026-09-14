@@ -2,7 +2,7 @@
 
 <h1>Pagos de la Reserva #@ViewBag.IdReserva</h1>
 
-<p><a asp-action="Create" asp-route-idReserva="@ViewBag.IdReserva">Cargar nuevo pago</a></p>
+<p><a asp-action="Create" asp-route-idReserva="@ViewBag.IdReserva" class= "btn btn-primary">Cargar nuevo pago</a></p>
 
 <table class="table">
     <thead>
@@ -34,8 +34,8 @@
                 <td>
                     @if (item.Estado)
                     {
-                        <a asp-action="Edit" asp-route-id="@item.IdPago">Editar concepto</a> 
-                        <a asp-action="Anular" asp-route-id="@item.IdPago">Anular</a>
+                        <a asp-action="Edit" asp-route-id="@item.IdPago" class= "btn btn-primary">Editar concepto</a> 
+                        <a asp-action="Anular" asp-route-id="@item.IdPago" class= "btn btn-primary">Anular</a>
                     }
                 </td>
             </tr>
@@ -43,4 +43,4 @@
     </tbody>
 </table>
 
-<a asp-controller="Reserva" asp-action="Details" asp-route-id="@ViewBag.IdReserva">Volver a la reserva</a>
+<a asp-controller="Reserva" asp-action="Details" asp-route-id="@ViewBag.IdReserva" class= "btn btn-primary">Volver a la reserva</a>

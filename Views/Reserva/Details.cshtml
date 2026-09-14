@@ -1,0 +1,48 @@
+@model Reserva
+
+<h1>Detalle de Reserva</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Inquilino</dt>
+    <dd class="col-sm-9">@Model.NombreInquilino</dd>
+    <dt class="col-sm-3">Inmueble</dt>
+    <dd class="col-sm-9">@Model.DireccionInmueble</dd>
+    <dt class="col-sm-3">Monto por día</dt>
+    <dd class="col-sm-9">@Model.MontoDia.ToString("C")</dd>
+    <dt class="col-sm-3">Desde</dt>
+    <dd class="col-sm-9">@Model.FechaDesde.ToShortDateString()</dd>
+    <dt class="col-sm-3">Hasta</dt>
+    <dd class="col-sm-9">@Model.FechaHasta.ToShortDateString()</dd>
+    <dt class="col-sm-3">Estado</dt>
+    <dd class="col-sm-9">@(Model.Estado ? "Activa" : "Inactiva")</dd>
+</dl>
+
+<h3>Pagos</h3>
+
+<p><a asp-controller="Pago" asp-action="Create" asp-route-idReserva="@Model.IdReserva" class= "btn btn-primary">Cargar pago</a></p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Concepto</th>
+            <th>Fecha</th>
+            <th>Importe</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pago in (IEnumerable<Pago>)ViewBag.Pagos)
+        {
+            <tr class="@(pago.Estado ? "" : "table-secondary text-muted")">
+                <td>@pago.Concepto</td>
+                <td>@pago.FechaPago.ToShortDateString()</td>
+                <td>@pago.Importe.ToString("C")</td>
+                <td>@(pago.Estado ? "Activo" : "Anulado")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p><a asp-controller="Pago" asp-action="Index" asp-route-idReserva="@Model.IdReserva" class= "btn btn-primary">Ver todos los pagos</a></p>
+
+<a asp-action="Index" class= "btn btn-primary">Volver al listado de reservas</a>

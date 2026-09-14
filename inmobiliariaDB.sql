@@ -38,7 +38,7 @@ CREATE TABLE inquilino (
     estado           BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-CREATE TABLE inmuebles (
+CREATE TABLE inmueble (
     id_inmueble         INT AUTO_INCREMENT PRIMARY KEY,
     direccion           VARCHAR(150) NOT NULL,
     cupo                INT NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE inmuebles (
     latitud             DECIMAL(10,7),
     longitud            DECIMAL(10,7),
     id_propietario      INT NOT NULL,
-    id_tipo INT NOT NULL,
+    id_tipo             INT NOT NULL,
     estado              BOOLEAN NOT NULL DEFAULT TRUE,
 
     CONSTRAINT fk_inmueble_propietario
@@ -89,7 +89,6 @@ CREATE TABLE IF NOT EXISTS imagenes (
     id_imagen INT NOT NULL AUTO_INCREMENT,
     inmueble_id INT NOT NULL,
     url VARCHAR(255) NOT NULL,
-
     PRIMARY KEY (id_imagen),
 
     CONSTRAINT fk_imagen_inmueble
@@ -106,6 +105,17 @@ CREATE TABLE TipoInmueble (
     Nombre VARCHAR(100) NOT NULL,
     Estado BOOLEAN NOT NULL DEFAULT TRUE
 );
+
+CREATE TABLE pago (
+    id_pago          INT AUTO_INCREMENT PRIMARY KEY,
+    id_reserva       INT NOT NULL,
+    concepto         VARCHAR(200) NOT NULL,
+    fecha_pago       DATE NOT NULL,
+    importe          DECIMAL(10,2) NOT NULL,
+    estado           BOOLEAN NOT NULL DEFAULT TRUE,  -- true = activo, false = anulado
+    CONSTRAINT fk_pago_reserva FOREIGN KEY (id_reserva) REFERENCES reserva(id_reserva)
+);
+ 
 
 -- =========================================================
 -- Datos iniciales de prueba
