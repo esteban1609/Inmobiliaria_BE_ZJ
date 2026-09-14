@@ -1,0 +1,43 @@
+@model TipoInmueble
+
+<div class="container mt-4">
+
+    <h2 class="fw-bold">Nuevo Tipo de Inmueble</h2>
+
+    <p class="text-muted">
+        Complete los datos para registrar un nuevo tipo.
+    </p>
+
+    <form asp-action="Create" method="post">
+
+        <div asp-validation-summary="All" class="text-danger mb-3">
+        </div>
+
+        <div class="mb-3">
+
+            <label asp-for="Nombre" class="form-label">
+                Nombre
+            </label>
+
+            <input asp-for="Nombre" class="form-control" placeholder="Ej: Casa, Departamento, Local Comercial" />
+
+            <span asp-validation-for="Nombre" class="text-danger">
+            </span>
+
+        </div>
+
+        <div class="mt-4">
+
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                Volver
+            </a>
+
+            <button type="submit" class="btn btn-primary">
+                Guardar
+            </button>
+
+        </div>
+
+    </form>
+
+</div>

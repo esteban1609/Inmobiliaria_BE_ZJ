@@ -1,0 +1,94 @@
+@model IEnumerable<TipoInmueble>
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Tipos de Inmueble</h2>
+            <p class="text-muted mb-0">
+                Administración de tipos de inmueble
+            </p>
+        </div>
+
+        <a asp-action="Create" class="btn btn-primary">
+            + Nuevo Tipo
+        </a>
+    </div>
+
+    <table class="table table-hover">
+
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+
+                    <td>
+                        @item.Nombre
+                    </td>
+
+                    <td>
+                        @if (item.Estado)
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactivo</span>
+                        }
+                    </td>
+
+                    <td>
+
+                        <a asp-action="Edit"
+                           asp-route-id="@item.id_tipo"
+                           class="btn btn-sm btn-outline-primary">
+                            Editar
+                        </a>
+
+                        @if (item.Estado)
+                        {
+                            <form asp-action="DarDeBaja"
+                                  asp-route-id="@item.id_tipo"
+                                  method="post"
+                                  style="display:inline">
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-danger">
+                                    Dar de baja
+                                </button>
+
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="Reactivar"
+                                  asp-route-id="@item.id_tipo"
+                                  method="post"
+                                  style="display:inline">
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-success">
+                                    Reactivar
+                                </button>
+
+                            </form>
+                        }
+
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>

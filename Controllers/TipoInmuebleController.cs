@@ -57,6 +57,20 @@ namespace Inmobiliaria_BarrosoEsteban
             return View(tipo);
         }
 
+
+        // EDIT GET
+        public IActionResult Edit(int id)
+        {
+            var tipo = repositorio.ObtenerPorId(id);
+
+            if (tipo == null)
+            {
+                return NotFound();
+            }
+
+            return View(tipo);
+        }
+
         // DETAILS
         public IActionResult Details(int id)
         {

@@ -22,7 +22,7 @@ namespace Inmobiliaria_BarrosoEsteban;
 
                 using (MySqlCommand command = new MySqlCommand(sql, connection))
                 {
-                    command.Parameters.AddWithValue("@Nombre", t.id_tipo);
+                    command.Parameters.AddWithValue("@Nombre", t.Nombre);
                     command.Parameters.AddWithValue("@Estado", t.Estado);
                     connection.Open();
                     res = Convert.ToInt32(command.ExecuteScalar());
