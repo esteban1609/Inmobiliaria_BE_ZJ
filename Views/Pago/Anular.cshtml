@@ -1,0 +1,19 @@
+@model Pago
+
+<h1>Anular Pago</h1>
+
+<p>¿Confirmás que querés anular este pago? Va a seguir apareciendo en el listado, marcado como "Anulado".</p>
+
+<dl class="row">
+    <dt class="col-sm-3">Concepto</dt>
+    <dd class="col-sm-9">@Model.Concepto</dd>
+    <dt class="col-sm-3">Fecha</dt>
+    <dd class="col-sm-9">@Model.FechaPago.ToShortDateString()</dd>
+    <dt class="col-sm-3">Importe</dt>
+    <dd class="col-sm-9">@Model.Importe.ToString("C")</dd>
+</dl>
+
+<form asp-action="Anular" asp-route-id="@Model.IdPago" method="post">
+    <button type="submit" class="btn btn-danger">Anular</button>
+    <a asp-action="Index" asp-route-idReserva="@Model.IdReserva" class="btn btn-secondary">Cancelar</a>
+</form>

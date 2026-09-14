@@ -1,0 +1,23 @@
+@model Pago
+
+<h1>Editar Concepto del Pago</h1>
+
+<p class="text-muted">Solo se puede modificar el concepto. El monto y la fecha quedan fijos, tal como se registraron.</p>
+
+<dl class="row">
+    <dt class="col-sm-3">Fecha</dt>
+    <dd class="col-sm-9">@Model.FechaPago.ToShortDateString()</dd>
+    <dt class="col-sm-3">Importe</dt>
+    <dd class="col-sm-9">@Model.Importe.ToString("C")</dd>
+</dl>
+
+<form asp-action="Edit" asp-route-id="@Model.IdPago" method="post">
+    <div class="mb-3">
+        <label asp-for="Concepto"></label>
+        <input asp-for="Concepto" name="concepto" class="form-control" />
+        <span asp-validation-for="Concepto" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    <a asp-action="Index" asp-route-idReserva="@Model.IdReserva" class="btn btn-secondary">Cancelar</a>
+</form>
