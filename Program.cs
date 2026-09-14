@@ -1,5 +1,6 @@
 using Inmobiliaria_BarrosoEsteban;
 using Inmobiliaria_BarrosoEsteban.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,23 @@ builder.Services.AddScoped<IRepositorioTipoInmueble, RepositorioTipoInmueble>();
 builder.Services.AddScoped<IRepositorioImagen, RepositorioImagen>();
 // Agrega aquí los demás repositorios que tengas (Inmueble, Pago, Contrato, etc.)
 
+//Autentificacion con cookies
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Login/Index";
+        options.AccessDeniedPath = "/Login/AccesoDenegado";
+    });
+
+
+// AUTORIZACION
+builder.Services.AddAuthorization();
+
+//Construccion de la app
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -26,9 +43,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapStaticAssets();
 
 app.MapControllerRoute(
