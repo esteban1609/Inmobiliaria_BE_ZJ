@@ -3,28 +3,35 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Inmobiliaria_BarrosoEsteban.Models
 {
-    public enum Roles
-    {
-        Administrador=1,
-        Empleado=2,
-    }
-
     public class Usuario
     {
         [Key]
-        [Display(Name ="codigo")]
-        public int id {get; set;}
+        public int IdUsuario { get; set; }
 
-        [Required]
-		public string Nombre { get; set; } = "";
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        [Display(Name = "Nombre")]
+        public string Nombre { get; set; } = string.Empty;
 
-        [Required]
-		public string Apellido { get; set; } = "";
+        [Required(ErrorMessage = "El apellido es obligatorio")]
+        [Display(Name = "Apellido")]
+        public string Apellido { get; set; } = string.Empty;
 
-        [Required, EmailAddress]
-		public string Email { get; set; } = "";
+        [Required(ErrorMessage = "El email es obligatorio")]
+        [EmailAddress(ErrorMessage = "El email no es válido")]
+        [Display(Name = "Email")]
+        public string Email { get; set; } = string.Empty;
 
-        [Required, DataType(DataType.Password)]
-		public string Clave { get; set; } = "";
+        // Contiene el HASH de la clave, nunca la clave en texto plano
+        [Display(Name = "Clave")]
+        public string Clave { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El rol es obligatorio")]
+        [Display(Name = "Rol")]
+        public string Rol { get; set; } = "Empleado"; // "Administrador" o "Empleado"
+
+        [Display(Name = "Avatar")]
+        public string? Avatar { get; set; }
+
+        public bool Estado { get; set; } = true;
     }
 }

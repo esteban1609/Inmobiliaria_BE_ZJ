@@ -1,9 +1,11 @@
 
-using Inmobiliaria_BarrosoEsteban.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Inmobiliaria_BarrosoEsteban.Models;
 
 namespace Inmobiliaria_BarrosoEsteban.Controllers
 {
+    [Authorize]
     public class PropietarioController : Controller
     {
         private readonly IRepositorioPropietario repositorio;
@@ -28,23 +30,15 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         // POST: Propietario/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public IActionResult Create(Propietario p)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (ModelState.IsValid)
-                {
-                    repositorio.Alta(p);
-                    return RedirectToAction(nameof(Index));
-                }
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Ocurrió un error al guardar: " + ex.Message);
+                return View(p);
             }
 
-            return View(p);
+            repositorio.Alta(p);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Propietario/Edit/5
@@ -57,66 +51,33 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         // POST: Propietario/Edit/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Propietario p)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                p.IdPropietario = id;
-
-                if (ModelState.IsValid)
-                {
-                    repositorio.Modificacion(p);
-                    return RedirectToAction(nameof(Index));
-                }
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Ocurrió un error al modificar: " + ex.Message);
+                return View(p);
             }
 
-            return View(p);
+            p.IdPropietario = id;
+            repositorio.Modificacion(p);
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: Propietario/Delete/5
-        public IActionResult Delete(int id)
-        {
-            var p = repositorio.ObtenerPorId(id);
-            if (p == null) return NotFound();
-            return View(p);
-        }
-
-        // POST: Propietario/Delete/5
+        // POST: Propietario/Delete/5 (baja lógica) -- SOLO Administrador
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public IActionResult DeleteConfirmed(int id)
         {
-            try
-            {
-                repositorio.Baja(id);
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "No se pudo eliminar el propietario: " + ex.Message;
-                return RedirectToAction(nameof(Index));
-            }
+            repositorio.Baja(id);
+            return RedirectToAction(nameof(Index));
         }
 
-        // POST: Propietario/Reactivar/5
+        // POST: Propietario/Reactivar/5 -- SOLO Administrador
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public IActionResult Reactivar(int id)
         {
-            try
-            {
-                repositorio.Reactivar(id);
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "No se pudo reactivar el propietario: " + ex.Message;
-            }
-
+            repositorio.Reactivar(id);
             return RedirectToAction(nameof(Index));
         }
     }

@@ -112,8 +112,19 @@ CREATE TABLE pago (
     concepto         VARCHAR(200) NOT NULL,
     fecha_pago       DATE NOT NULL,
     importe          DECIMAL(10,2) NOT NULL,
-    estado           BOOLEAN NOT NULL DEFAULT TRUE,  -- true = activo, false = anulado
+    estado           BOOLEAN NOT NULL DEFAULT TRUE,  
     CONSTRAINT fk_pago_reserva FOREIGN KEY (id_reserva) REFERENCES reserva(id_reserva)
+);
+
+CREATE TABLE usuario (
+    id_usuario       INT AUTO_INCREMENT PRIMARY KEY,
+    nombre           VARCHAR(100) NOT NULL,
+    apellido         VARCHAR(100) NOT NULL,
+    email            VARCHAR(150) NOT NULL UNIQUE,
+    clave            VARCHAR(255) NOT NULL,  
+    rol              VARCHAR(20) NOT NULL,   
+    avatar           VARCHAR(255),
+    estado           BOOLEAN NOT NULL DEFAULT TRUE
 );
  
 

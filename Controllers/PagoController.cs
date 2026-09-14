@@ -1,18 +1,20 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Inmobiliaria_BarrosoEsteban.Models;
 
 namespace Inmobiliaria_BarrosoEsteban.Controllers
 {
+    [Authorize]
     public class PagoController : Controller
     {
         private readonly IRepositorioPago repositorio;
 
-        public PagoController(IConfiguration configuration)
+        public PagoController(IRepositorioPago repositorio)
         {
-            repositorio = new RepositorioPago(configuration);
+            this.repositorio = repositorio;
         }
 
-        // GET: Pago?idReserva=5  (listado de pagos de una reserva puntual)
+        // GET: Pago?idReserva=5
         public IActionResult Index(int idReserva)
         {
             ViewBag.IdReserva = idReserva;
@@ -40,7 +42,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             return RedirectToAction(nameof(Index), new { idReserva = p.IdReserva });
         }
 
-        // GET: Pago/Edit/5  (solo permite tocar el concepto)
+        // GET: Pago/Edit/5
         public IActionResult Edit(int id)
         {
             var p = repositorio.ObtenerPorId(id);
@@ -66,7 +68,8 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             return RedirectToAction(nameof(Index), new { idReserva = pago?.IdReserva });
         }
 
-        // GET: Pago/Anular/5
+        // GET: Pago/Anular/5 -- SOLO Administrador
+        [Authorize(Roles = "Administrador")]
         public IActionResult Anular(int id)
         {
             var p = repositorio.ObtenerPorId(id);
@@ -75,8 +78,9 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             return View(p);
         }
 
-        // POST: Pago/Anular/5
+        // POST: Pago/Anular/5 -- SOLO Administrador
         [HttpPost, ActionName("Anular")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult AnularConfirmado(int id)
         {
             var p = repositorio.ObtenerPorId(id);

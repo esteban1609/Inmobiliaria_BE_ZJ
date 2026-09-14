@@ -13,7 +13,10 @@ builder.Services.AddScoped<IRepositorioPropietario, RepositorioPropietario>();
 builder.Services.AddScoped<IRepositorioInmueble, RepositorioInmueble>();
 builder.Services.AddScoped<IRepositorioTipoInmueble, RepositorioTipoInmueble>();
 builder.Services.AddScoped<IRepositorioImagen, RepositorioImagen>();
-// Agrega aquí los demás repositorios que tengas (Inmueble, Pago, Contrato, etc.)
+builder.Services.AddScoped<IRepositorioReserva, RepositorioReserva>();
+builder.Services.AddScoped<IRepositorioPago, RepositorioPago>();
+builder.Services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
+// Agrega aquí los demás repositorios que tengas (Contrato, etc.)
 
 //Autentificacion con cookies
 builder.Services
@@ -52,5 +55,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+ 
 
 app.Run();
