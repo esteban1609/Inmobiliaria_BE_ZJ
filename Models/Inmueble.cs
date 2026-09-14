@@ -27,14 +27,14 @@ namespace Inmobiliaria_BarrosoEsteban.Models
 		[Range(0, 100)]
 		public decimal PorcentajeReserva { get; set; }
 
-		public int id_tipo {get;set;}
+		public int id_tipo { get; set; }
 
 		public TipoInmueble? TipoInmueble { get; set; }
 
-[Range(-90, 90, ErrorMessage = "La latitud debe estar entre -90 y 90")]
+		[Range(-90, 90, ErrorMessage = "La latitud debe estar entre -90 y 90")]
 		public decimal Latitud { get; set; }
-		
-[Range(-180, 180, ErrorMessage = "La longitud debe estar entre -180 y 180")]
+
+		[Range(-180, 180, ErrorMessage = "La longitud debe estar entre -180 y 180")]
 		public decimal Longitud { get; set; }
 
 		// FK del propietario
@@ -43,6 +43,12 @@ namespace Inmobiliaria_BarrosoEsteban.Models
 
 		[ForeignKey(nameof(IdPropietario))]
 		public Propietario? Propietario { get; set; }
+		public string? Portada { get; set; }
+
+		[NotMapped]//Para EF
+		public IFormFile? PortadaFile { get; set; }
+		[ForeignKey(nameof(Imagen.InmuebleId))]
+		public IList<Imagen> Imagenes { get; set; } = new List<Imagen>();
 
 		public bool Estado { get; set; } = true;
 	}

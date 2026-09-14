@@ -8,6 +8,7 @@ namespace Inmobiliaria_BarrosoEsteban.Models
 
         Inmueble? ObtenerPorId(int id);
 
+        int ModificarPortada(int InmuebleId, string ruta);
         int Modificacion(Inmueble inmueble);
 
         int Baja(int id);

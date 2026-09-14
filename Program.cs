@@ -11,6 +11,7 @@ builder.Services.AddScoped<IRepositorioInquilino, RepositorioInquilino>();
 builder.Services.AddScoped<IRepositorioPropietario, RepositorioPropietario>();
 builder.Services.AddScoped<IRepositorioInmueble, RepositorioInmueble>();
 builder.Services.AddScoped<IRepositorioTipoInmueble, RepositorioTipoInmueble>();
+builder.Services.AddScoped<IRepositorioImagen, RepositorioImagen>();
 // Agrega aquí los demás repositorios que tengas (Inmueble, Pago, Contrato, etc.)
 
 var app = builder.Build();

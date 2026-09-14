@@ -85,6 +85,21 @@ CREATE TABLE reserva (
         ON UPDATE CASCADE,
 );
 
+CREATE TABLE IF NOT EXISTS imagenes (
+    id_imagen INT NOT NULL AUTO_INCREMENT,
+    inmueble_id INT NOT NULL,
+    url VARCHAR(255) NOT NULL,
+
+    PRIMARY KEY (id_imagen),
+
+    CONSTRAINT fk_imagen_inmueble
+        FOREIGN KEY (inmueble_id)
+        REFERENCES inmueble(id_inmueble)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+
 
 CREATE TABLE TipoInmueble (
     id_tipo INT AUTO_INCREMENT PRIMARY KEY,

@@ -83,13 +83,13 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         return res;
     }
 
-public int Modificacion(Inmueble i)
-{
-    int res = -1;
-
-    using (MySqlConnection connection = new MySqlConnection(connectionString))
+    public int Modificacion(Inmueble i)
     {
-        string sql = @"UPDATE inmueble SET
+        int res = -1;
+
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            string sql = @"UPDATE inmueble SET
                         direccion = @direccion,
                         cupo = @cupo,
                         precio_por_dia = @precioPorDia,
@@ -100,25 +100,25 @@ public int Modificacion(Inmueble i)
                         id_tipo = @tipoId
                        WHERE id_inmueble = @id;";
 
-        using (MySqlCommand command = new MySqlCommand(sql, connection))
-        {
-            command.Parameters.AddWithValue("@direccion", i.Direccion);
-            command.Parameters.AddWithValue("@cupo", i.Cupo);
-            command.Parameters.AddWithValue("@precioPorDia", i.PrecioPorDia);
-            command.Parameters.AddWithValue("@porcentajeReserva", i.PorcentajeReserva);
-            command.Parameters.AddWithValue("@latitud", i.Latitud);
-            command.Parameters.AddWithValue("@longitud", i.Longitud);
-            command.Parameters.AddWithValue("@propietarioId", i.IdPropietario);
-            command.Parameters.AddWithValue("@tipoId", i.id_tipo);
-            command.Parameters.AddWithValue("@id", i.IdInmueble);
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@direccion", i.Direccion);
+                command.Parameters.AddWithValue("@cupo", i.Cupo);
+                command.Parameters.AddWithValue("@precioPorDia", i.PrecioPorDia);
+                command.Parameters.AddWithValue("@porcentajeReserva", i.PorcentajeReserva);
+                command.Parameters.AddWithValue("@latitud", i.Latitud);
+                command.Parameters.AddWithValue("@longitud", i.Longitud);
+                command.Parameters.AddWithValue("@propietarioId", i.IdPropietario);
+                command.Parameters.AddWithValue("@tipoId", i.id_tipo);
+                command.Parameters.AddWithValue("@id", i.IdInmueble);
 
-            connection.Open();
-            res = command.ExecuteNonQuery();
+                connection.Open();
+                res = command.ExecuteNonQuery();
+            }
         }
-    }
 
-    return res;
-}
+        return res;
+    }
 
 
 
@@ -140,6 +140,7 @@ public int Modificacion(Inmueble i)
             i.id_propietario,
             i.estado,
             i.id_tipo,
+            i.portada,
             p.nombre AS propietario_nombre,
             p.apellido AS propietario_apellido,
             t.Nombre AS tipo_nombre
@@ -175,6 +176,8 @@ public int Modificacion(Inmueble i)
                 Longitud = reader.GetDecimal("longitud"),
                 IdPropietario = reader.GetInt32("id_propietario"),
                 Estado = reader.GetBoolean("estado"),
+                id_tipo = reader.GetInt32("id_tipo"),
+                Portada = reader.IsDBNull(reader.GetOrdinal("portada"))? null: reader.GetString("portada"),
                 Propietario = new Propietario
                 {
                     IdPropietario = reader.GetInt32("id_propietario"),
@@ -213,6 +216,7 @@ public int Modificacion(Inmueble i)
                     i.id_propietario,
                     i.estado,
                     i.id_tipo,
+                    i.portada,
                     p.nombre AS propietario_nombre,
                     p.apellido AS propietario_apellido,
                     t.Nombre AS tipo_nombre
@@ -243,6 +247,7 @@ public int Modificacion(Inmueble i)
                 IdPropietario = reader.GetInt32("id_propietario"),
                 Estado = reader.GetBoolean("estado"),
                 id_tipo = reader.GetInt32("id_tipo"),
+                Portada = reader.IsDBNull(reader.GetOrdinal("portada"))? null: reader.GetString("portada"),
                 Propietario = new Propietario
                 {
                     IdPropietario = reader.GetInt32("id_propietario"),
@@ -260,6 +265,65 @@ public int Modificacion(Inmueble i)
         }
 
         return lista;
+    }
+    // public int ModificarPortada(int id, string url)
+    // {
+    //     int res = -1;
+
+    //     using (MySqlConnection connection =
+    //            new MySqlConnection(connectionString))
+    //     {
+    //         string sql = @"
+    //         UPDATE inmueble
+    //         SET portada = @portada
+    //         WHERE id_inmueble = @id;";
+
+    //         using (MySqlCommand command =
+    //                new MySqlCommand(sql, connection))
+    //         {
+    //             command.Parameters.AddWithValue(
+    //                 "@portada",
+    //                 string.IsNullOrEmpty(url)
+    //                     ? DBNull.Value
+    //                     : url
+    //             );
+
+    //             command.Parameters.AddWithValue("@id", id);
+
+    //             connection.Open();
+
+    //             res = command.ExecuteNonQuery();
+    //         }
+    //     }
+
+    //     return res;
+    // }
+
+    public int ModificarPortada(int id, string url)
+    {
+        int res = -1;
+
+        using (MySqlConnection connection =
+               new MySqlConnection(connectionString))
+        {
+            string sql = @"
+            UPDATE inmueble
+            SET portada = @portada
+            WHERE id_inmueble = @id;";
+
+            using (MySqlCommand command =
+                   new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@portada", url);
+                command.Parameters.AddWithValue("@id", id);
+
+                connection.Open();
+
+                res = command.ExecuteNonQuery();
+            }
+        }
+
+        return res;
     }
 
 }
