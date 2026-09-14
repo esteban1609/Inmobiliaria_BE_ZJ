@@ -580,6 +580,95 @@ public IList<Inmueble> MasReservadosUltimos365Dias()
     return lista;
 }
 
+
+public IList<Inmueble> SinReservasUltimosDias(int dias)
+{
+    var lista = new List<Inmueble>();
+
+    using var connection =
+        new MySqlConnection(connectionString);
+
+    string sql = @"
+        SELECT
+            i.id_inmueble,
+            i.direccion,
+            i.estado,
+            p.nombre AS propietario_nombre,
+            p.apellido AS propietario_apellido,
+            t.Nombre AS tipo_nombre
+
+        FROM inmueble i
+
+        INNER JOIN propietario p
+            ON i.id_propietario = p.id_propietario
+
+        INNER JOIN TipoInmueble t
+            ON i.id_tipo = t.id_tipo
+
+        WHERE NOT EXISTS
+        (
+            SELECT 1
+            FROM reserva r
+
+            WHERE r.id_inmueble = i.id_inmueble
+
+            AND r.fecha_desde >=
+                DATE_SUB(CURDATE(), INTERVAL @dias DAY)
+        )
+
+        ORDER BY i.direccion;";
+
+    using var command =
+        new MySqlCommand(sql, connection);
+
+    command.Parameters.AddWithValue(
+        "@dias",
+        dias
+    );
+
+    connection.Open();
+
+    using var reader =
+        command.ExecuteReader();
+
+    while (reader.Read())
+    {
+        var inmueble = new Inmueble
+        {
+            IdInmueble =
+                reader.GetInt32("id_inmueble"),
+
+            Direccion =
+                reader.GetString("direccion"),
+
+            Estado =
+                reader.GetBoolean("estado"),
+
+            Propietario = new Propietario
+            {
+                Nombre =
+                    reader.GetString(
+                        "propietario_nombre"),
+
+                Apellido =
+                    reader.GetString(
+                        "propietario_apellido")
+            },
+
+            TipoInmueble = new TipoInmueble
+            {
+                Nombre =
+                    reader.GetString(
+                        "tipo_nombre")
+            }
+        };
+
+        lista.Add(inmueble);
+    }
+
+    return lista;
+}
+
     public int ModificarPortada(int id, string url)
     {
         int res = -1;

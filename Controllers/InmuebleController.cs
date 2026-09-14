@@ -72,6 +72,22 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             return View(lista);
         }
 
+
+        public IActionResult SinReservas(int dias = 30)
+        {
+            if (dias <= 0)
+            {
+                dias = 30;
+            }
+
+            var lista =
+                repositorio.SinReservasUltimosDias(dias);
+
+            ViewBag.Dias = dias;
+
+            return View(lista);
+        }
+
         // CREATE GET
         public IActionResult Create()
         {
