@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Inmobiliaria_BarrosoEsteban.Models;
 using Inmobiliaria_BarrosoEsteban;
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace Inmobiliaria_BarrosoEsteban.Controllers
 {
@@ -24,9 +24,24 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
         }
 
         // LISTADO
-        public IActionResult Index()
+        public IActionResult Index(bool? estado)
         {
-            var lista = repositorio.Listar();
+            IList<Inmueble> lista;
+
+            if (estado.HasValue)
+            {
+                lista =
+                    repositorio.ListarPorEstado(
+                        estado.Value
+                    );
+            }
+            else
+            {
+                lista = repositorio.Listar();
+            }
+
+            ViewBag.EstadoSeleccionado = estado;
+
             return View(lista);
         }
 
@@ -55,61 +70,62 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
 
         // POST: Inmuebles/Portada
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public ActionResult Portada(Imagen entidad, [FromServices] IWebHostEnvironment environment)
-		{
-			try
-			{
-				//Recuperar el inmueble y eliminar la imagen anterior
-				var inmueble = repositorio.ObtenerPorId(entidad.InmuebleId);
-				if (inmueble != null && inmueble.Portada != null)
-				{
-					string rutaEliminar = Path.Combine(environment.WebRootPath, "Uploads", "Inmuebles", Path.GetFileName(inmueble.Portada));
-					System.IO.File.Delete(rutaEliminar);
-				}
-				if (entidad.Archivo != null)
-				{
-					string wwwPath = environment.WebRootPath;
-					string path = Path.Combine(wwwPath, "Uploads");
-					if (!Directory.Exists(path))
-					{
-						Directory.CreateDirectory(path);
-					}
-					path = Path.Combine(path, "Inmuebles");
-					if (!Directory.Exists(path))
-					{
-						Directory.CreateDirectory(path);
-					}
-					//string fileName = Path.GetFileName(entidad.Archivo.FileName);//este nombre se puede repetir
-					string fileName = "portada_" + entidad.InmuebleId + Path.GetExtension(entidad.Archivo.FileName);
-					string rutaFisicaCompleta = Path.Combine(path, fileName);
-					using (var stream = new FileStream(rutaFisicaCompleta, FileMode.Create))
-					{
-						entidad.Archivo.CopyTo(stream);
-					}
-					entidad.Url = Path.Combine("/Uploads/Inmuebles", fileName);
-				}
-				else //sin imagen
-				{
-					entidad.Url = string.Empty;
-				}
-				repositorio.ModificarPortada(entidad.InmuebleId, entidad.Url);
-				TempData["Mensaje"] = "Portada actualizada correctamente";
-				return RedirectToAction(nameof(Index));
-			}
-			catch (Exception ex)
-			{
-				TempData["Error"] = ex.Message;
-				return RedirectToAction(nameof(Imagenes), new { id = entidad.InmuebleId });
-			}
-		}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Portada(Imagen entidad, [FromServices] IWebHostEnvironment environment)
+        {
+            try
+            {
+                //Recuperar el inmueble y eliminar la imagen anterior
+                var inmueble = repositorio.ObtenerPorId(entidad.InmuebleId);
+                if (inmueble != null && inmueble.Portada != null)
+                {
+                    string rutaEliminar = Path.Combine(environment.WebRootPath, "Uploads", "Inmuebles", Path.GetFileName(inmueble.Portada));
+                    System.IO.File.Delete(rutaEliminar);
+                }
+                if (entidad.Archivo != null)
+                {
+                    string wwwPath = environment.WebRootPath;
+                    string path = Path.Combine(wwwPath, "Uploads");
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                    }
+                    path = Path.Combine(path, "Inmuebles");
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                    }
+                    //string fileName = Path.GetFileName(entidad.Archivo.FileName);//este nombre se puede repetir
+                    string fileName = "portada_" + entidad.InmuebleId + Path.GetExtension(entidad.Archivo.FileName);
+                    string rutaFisicaCompleta = Path.Combine(path, fileName);
+                    using (var stream = new FileStream(rutaFisicaCompleta, FileMode.Create))
+                    {
+                        entidad.Archivo.CopyTo(stream);
+                    }
+                    entidad.Url = Path.Combine("/Uploads/Inmuebles", fileName);
+                }
+                else //sin imagen
+                {
+                    entidad.Url = string.Empty;
+                }
+                repositorio.ModificarPortada(entidad.InmuebleId, entidad.Url);
+                TempData["Mensaje"] = "Portada actualizada correctamente";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction(nameof(Imagenes), new { id = entidad.InmuebleId });
+            }
+        }
 
 
 
         // CREATE POST
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public IActionResult Create(Inmueble inmueble)
         {
             if (ModelState.IsValid)
@@ -124,6 +140,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
 
         // EDIT GET
+
         public IActionResult Edit(int id)
         {
             var inmueble = repositorio.ObtenerPorId(id);
@@ -139,6 +156,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
         // EDIT POST
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public IActionResult Edit(int id, Inmueble i)
         {
             i.IdInmueble = id;
@@ -181,6 +199,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
         // DELETE POST / BAJA LOGICA
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public IActionResult DeleteConfirmed(int id)
         {
             repositorio.Baja(id);
@@ -190,6 +209,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
         // REACTIVAR
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public IActionResult Reactivar(int id)
         {
             repositorio.Reactivar(id);

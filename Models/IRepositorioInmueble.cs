@@ -3,6 +3,7 @@ namespace Inmobiliaria_BarrosoEsteban.Models
     public interface IRepositorioInmueble
     {
         IList<Inmueble> Listar();
+        IList<Inmueble> ListarPorEstado(bool estado);
 
         int Alta(Inmueble inmueble);
 

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Inmobiliaria_BarrosoEsteban.Models;
 using Inmobiliaria_BarrosoEsteban;
-
+using Microsoft.AspNetCore.Authorization;
 namespace Inmobiliaria_.Net_Core.Controllers
 {
     public class InquilinosController : Controller
@@ -26,6 +26,7 @@ namespace Inmobiliaria_.Net_Core.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles ="Administrador")]
         public IActionResult Create(Inquilino inquilino)
         {
             if (ModelState.IsValid)
@@ -48,6 +49,7 @@ namespace Inmobiliaria_.Net_Core.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles ="Administrador")]
         public IActionResult Edit(int id, Inquilino inquilino)
         {
             try
@@ -79,6 +81,7 @@ namespace Inmobiliaria_.Net_Core.Controllers
         // POST: Inquilinos/Delete/5
         [HttpPost, ActionName("Delete")] // <-- Mapea la acción para que responda a Delete
         [ValidateAntiForgeryToken]
+        [Authorize(Roles ="Administrador")]
         public IActionResult DeleteConfirmed(int id)
         {
             repositorio.Baja(id);
@@ -86,6 +89,7 @@ namespace Inmobiliaria_.Net_Core.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles ="Administrador")]
         public IActionResult Reactivar(int id)
         {
             repositorio.Reactivar(id);

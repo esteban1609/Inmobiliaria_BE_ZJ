@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Inmobiliaria_BarrosoEsteban.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Inmobiliaria_BarrosoEsteban.Controllers
 {
@@ -51,6 +52,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         // POST: Reserva/Create
         [HttpPost]
+        [Authorize(Roles ="Administrador")]
         public IActionResult Create(Reserva r)
         {
             if (!ModelState.IsValid)
@@ -75,6 +77,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         // POST: Reserva/Edit/5
         [HttpPost]
+        [Authorize(Roles ="Administrador")]
         public IActionResult Edit(int id, Reserva r)
         {
             if (!ModelState.IsValid)
@@ -99,6 +102,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         // POST: Reserva/Delete/5 (baja lógica)
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles ="Administrador")]
         public IActionResult DeleteConfirmed(int id)
         {
             repositorio.Baja(id);
@@ -107,6 +111,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         // POST: Reserva/Reactivar/5
         [HttpPost]
+        [Authorize(Roles ="Administrador")]
         public IActionResult Reactivar(int id)
         {
             repositorio.Reactivar(id);
