@@ -5,6 +5,10 @@ namespace Inmobiliaria_BarrosoEsteban.Models
         IList<Inmueble> Listar();
         IList<Inmueble> ListarPorEstado(bool estado);
 
+        IList<Inmueble> ListarPorPropietario(int idPropietario);
+
+        IList<Inmueble> MasReservadosUltimos365Dias();
+
         int Alta(Inmueble inmueble);
 
         Inmueble? ObtenerPorId(int id);

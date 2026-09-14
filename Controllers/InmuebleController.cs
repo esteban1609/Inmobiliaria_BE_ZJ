@@ -24,23 +24,50 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
         }
 
         // LISTADO
-        public IActionResult Index(bool? estado)
+        public IActionResult Index(bool? estado, int? idPropietario)
         {
             IList<Inmueble> lista;
 
-            if (estado.HasValue)
+            if (idPropietario.HasValue)
             {
-                lista =
-                    repositorio.ListarPorEstado(
-                        estado.Value
-                    );
+                lista = repositorio.ListarPorPropietario(
+                    idPropietario.Value
+                );
+
+                // Si además eligió estado, filtramos el resultado
+                if (estado.HasValue)
+                {
+                    lista = lista
+                        .Where(i => i.Estado == estado.Value)
+                        .ToList();
+                }
+            }
+            else if (estado.HasValue)
+            {
+                lista = repositorio.ListarPorEstado(
+                    estado.Value
+                );
             }
             else
             {
                 lista = repositorio.Listar();
             }
 
+            // Lista de propietarios para el select
+            ViewBag.Propietarios = repoPropietario.Listar();
+
+            // Mantener los filtros seleccionados
             ViewBag.EstadoSeleccionado = estado;
+            ViewBag.PropietarioSeleccionado = idPropietario;
+
+            return View(lista);
+        }
+
+        //Inmuebles mas reservados en los ultimos 365 dias
+        public IActionResult MasReservados()
+        {
+            var lista =
+                repositorio.MasReservadosUltimos365Dias();
 
             return View(lista);
         }
@@ -215,6 +242,10 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             repositorio.Reactivar(id);
             return RedirectToAction(nameof(Index));
         }
+
+
+
+
 
 
     }

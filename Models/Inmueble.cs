@@ -50,6 +50,9 @@ namespace Inmobiliaria_BarrosoEsteban.Models
 		[ForeignKey(nameof(Imagen.InmuebleId))]
 		public IList<Imagen> Imagenes { get; set; } = new List<Imagen>();
 
+		[NotMapped]
+		public int CantidadReservas { get; set; }
+
 		public bool Estado { get; set; } = true;
 	}
 }

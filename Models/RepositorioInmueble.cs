@@ -387,6 +387,199 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
         return lista;
     }
 
+
+    public IList<Inmueble> ListarPorPropietario(int idPropietario)
+{
+    var lista = new List<Inmueble>();
+
+    using var connection =
+        new MySqlConnection(connectionString);
+
+    string sql = @"
+        SELECT
+            i.id_inmueble,
+            i.direccion,
+            i.cupo,
+            i.precio_por_dia,
+            i.porcentaje_reserva,
+            i.latitud,
+            i.longitud,
+            i.id_propietario,
+            i.estado,
+            i.id_tipo,
+            i.portada,
+            p.nombre AS propietario_nombre,
+            p.apellido AS propietario_apellido,
+            t.Nombre AS tipo_nombre
+        FROM inmueble i
+
+        INNER JOIN propietario p
+            ON i.id_propietario = p.id_propietario
+
+        INNER JOIN TipoInmueble t
+            ON i.id_tipo = t.id_tipo
+
+        WHERE i.id_propietario = @idPropietario
+
+        ORDER BY i.id_inmueble;";
+
+    using var command =
+        new MySqlCommand(sql, connection);
+
+    command.Parameters.AddWithValue(
+        "@idPropietario",
+        idPropietario
+    );
+
+    connection.Open();
+
+    using var reader = command.ExecuteReader();
+
+    while (reader.Read())
+    {
+        var inmueble = new Inmueble
+        {
+            IdInmueble =
+                reader.GetInt32("id_inmueble"),
+
+            Direccion =
+                reader.GetString("direccion"),
+
+            Cupo =
+                reader.GetInt32("cupo"),
+
+            PrecioPorDia =
+                reader.GetDecimal("precio_por_dia"),
+
+            PorcentajeReserva =
+                reader.GetDecimal("porcentaje_reserva"),
+
+            Latitud =
+                reader.GetDecimal("latitud"),
+
+            Longitud =
+                reader.GetDecimal("longitud"),
+
+            IdPropietario =
+                reader.GetInt32("id_propietario"),
+
+            Estado =
+                reader.GetBoolean("estado"),
+
+            id_tipo =
+                reader.GetInt32("id_tipo"),
+
+            Portada =
+                reader.IsDBNull(
+                    reader.GetOrdinal("portada"))
+                ? null
+                : reader.GetString("portada"),
+
+            Propietario = new Propietario
+            {
+                IdPropietario =
+                    reader.GetInt32("id_propietario"),
+
+                Nombre =
+                    reader.GetString("propietario_nombre"),
+
+                Apellido =
+                    reader.GetString("propietario_apellido")
+            },
+
+            TipoInmueble = new TipoInmueble
+            {
+                id_tipo =
+                    reader.GetInt32("id_tipo"),
+
+                Nombre =
+                    reader.GetString("tipo_nombre")
+            }
+        };
+
+        lista.Add(inmueble);
+    }
+
+    return lista;
+}
+
+
+
+public IList<Inmueble> MasReservadosUltimos365Dias()
+{
+    var lista = new List<Inmueble>();
+
+    using var connection =
+        new MySqlConnection(connectionString);
+
+    string sql = @"
+        SELECT
+            i.id_inmueble,
+            i.direccion,
+            i.estado,
+            p.nombre AS propietario_nombre,
+            p.apellido AS propietario_apellido,
+            COUNT(r.id_reserva) AS cantidad_reservas
+
+        FROM inmueble i
+
+        INNER JOIN propietario p
+            ON i.id_propietario = p.id_propietario
+
+        INNER JOIN reserva r
+            ON r.id_inmueble = i.id_inmueble
+
+        WHERE r.fecha_desde >= DATE_SUB(CURDATE(), INTERVAL 365 DAY)
+
+        GROUP BY
+            i.id_inmueble,
+            i.direccion,
+            i.estado,
+            p.nombre,
+            p.apellido
+
+        ORDER BY cantidad_reservas DESC;";
+
+    using var command =
+        new MySqlCommand(sql, connection);
+
+    connection.Open();
+
+    using var reader =
+        command.ExecuteReader();
+
+    while (reader.Read())
+    {
+        var inmueble = new Inmueble
+        {
+            IdInmueble =
+                reader.GetInt32("id_inmueble"),
+
+            Direccion =
+                reader.GetString("direccion"),
+
+            Estado =
+                reader.GetBoolean("estado"),
+
+            CantidadReservas =
+                reader.GetInt32("cantidad_reservas"),
+
+            Propietario = new Propietario
+            {
+                Nombre =
+                    reader.GetString("propietario_nombre"),
+
+                Apellido =
+                    reader.GetString("propietario_apellido")
+            }
+        };
+
+        lista.Add(inmueble);
+    }
+
+    return lista;
+}
+
     public int ModificarPortada(int id, string url)
     {
         int res = -1;
