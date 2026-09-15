@@ -43,6 +43,22 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             return View(lista);
         }
 
+        //Reservas que estan por finalizar
+        public IActionResult ProximasAFinalizar(int dias = 30)
+        {
+            if (dias <= 0)
+            {
+                dias = 30;
+            }
+
+            var lista =
+                repositorio.ListarQueTerminanEnDias(dias);
+
+            ViewBag.Dias = dias;
+
+            return View(lista);
+        }
+
         // GET: Reserva/Details/5
         public IActionResult Details(int id)
         {

@@ -1,0 +1,133 @@
+@model IEnumerable<Inmobiliaria_BarrosoEsteban.Models.Reserva>
+
+<div class="container mt-4">
+
+    <div class="mb-4">
+
+        <h2 class="fw-bold">
+            Reservas próximas a finalizar
+        </h2>
+
+        <p class="text-muted">
+            Reservas que terminan dentro de los próximos
+            @ViewBag.Dias días.
+        </p>
+
+    </div>
+
+
+    <form asp-action="ProximasAFinalizar"
+          method="get"
+          class="mb-4">
+
+        <div class="row">
+
+            <div class="col-md-3">
+
+                <label class="form-label">
+                    Plazo en días
+                </label>
+
+                <input type="number"
+                       name="dias"
+                       value="@ViewBag.Dias"
+                       min="1"
+                       class="form-control" />
+
+            </div>
+
+            <div class="col-md-3 d-flex align-items-end">
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    Consultar
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+
+    @if (Model.Any())
+    {
+        <table class="table table-hover">
+
+            <thead>
+                <tr>
+                    <th>Inquilino</th>
+                    <th>Inmueble</th>
+                    <th>Monto/día</th>
+                    <th>Desde</th>
+                    <th>Hasta</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>
+                            @item.Inquilino?.Nombre
+                            @item.Inquilino?.Apellido
+                        </td>
+
+                        <td>
+                            @item.Inmueble?.Direccion
+                        </td>
+
+                        <td>
+                            @item.MontoDia.ToString("C")
+                        </td>
+
+                        <td>
+                            @item.FechaDesde.ToString("dd/MM/yyyy")
+                        </td>
+
+                        <td>
+                            <strong>
+                                @item.FechaHasta.ToString("dd/MM/yyyy")
+                            </strong>
+                        </td>
+
+                        <td>
+                            @if (item.Estado)
+                            {
+                                <span class="badge bg-success">
+                                    Activa
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">
+                                    Inactiva
+                                </span>
+                            }
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            No existen reservas que finalicen
+            dentro de los próximos @ViewBag.Dias días.
+        </div>
+    }
+
+
+    <a asp-action="Index"
+       class="btn btn-outline-secondary">
+        Volver a Reservas
+    </a>
+
+</div>

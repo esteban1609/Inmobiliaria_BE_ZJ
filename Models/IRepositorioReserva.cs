@@ -9,6 +9,7 @@ namespace Inmobiliaria_BarrosoEsteban
         int Modificacion(Reserva r);
         List<Reserva> Listar();
         IList<Reserva> ListarVigentes();
+        IList<Reserva> ListarQueTerminanEnDias(int dias);
         Reserva? ObtenerPorId(int id);
         int Reactivar(int id);
     }
