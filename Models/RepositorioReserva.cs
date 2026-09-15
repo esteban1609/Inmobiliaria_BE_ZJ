@@ -130,6 +130,99 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         return lista;
     }
 
+
+    public IList<Reserva> ListarVigentes()
+    {
+        var lista = new List<Reserva>();
+
+        using var connection =
+            new MySqlConnection(connectionString);
+
+        string sql = @"
+        SELECT
+            r.id_reserva,
+            r.id_inquilino,
+            r.id_inmueble,
+            r.monto_dia,
+            r.fecha_desde,
+            r.fecha_hasta,
+            r.estado,
+
+            inq.nombre AS inquilino_nombre,
+            inq.apellido AS inquilino_apellido,
+
+            i.direccion AS inmueble_direccion
+
+        FROM reserva r
+
+        INNER JOIN inquilino inq
+            ON r.id_inquilino = inq.id_inquilino
+
+        INNER JOIN inmueble i
+            ON r.id_inmueble = i.id_inmueble
+
+        WHERE r.estado = TRUE
+          AND CURDATE() BETWEEN
+              DATE(r.fecha_desde)
+              AND DATE(r.fecha_hasta)
+
+        ORDER BY r.fecha_hasta ASC;";
+
+        using var command =
+            new MySqlCommand(sql, connection);
+
+        connection.Open();
+
+        using var reader =
+            command.ExecuteReader();
+
+        while (reader.Read())
+        {
+            var reserva = new Reserva
+            {
+                IdReserva =
+                    reader.GetInt32("id_reserva"),
+
+                IdInquilino =
+                    reader.GetInt32("id_inquilino"),
+
+                IdInmueble =
+                    reader.GetInt32("id_inmueble"),
+
+                MontoDia =
+                    reader.GetDecimal("monto_dia"),
+
+                FechaDesde =
+                    reader.GetDateTime("fecha_desde"),
+
+                FechaHasta =
+                    reader.GetDateTime("fecha_hasta"),
+
+                Estado =
+                    reader.GetBoolean("estado"),
+
+                Inquilino = new Inquilino
+                {
+                    Nombre =
+                        reader.GetString("inquilino_nombre"),
+
+                    Apellido =
+                        reader.GetString("inquilino_apellido")
+                },
+
+                Inmueble = new Inmueble
+                {
+                    Direccion =
+                        reader.GetString("inmueble_direccion")
+                }
+            };
+
+            lista.Add(reserva);
+        }
+
+        return lista;
+    }
+
     public Reserva? ObtenerPorId(int id)
     {
         Reserva? r = null;

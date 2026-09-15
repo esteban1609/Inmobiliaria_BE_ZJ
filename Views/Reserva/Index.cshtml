@@ -2,7 +2,10 @@
 
 <h1>Reservas</h1>
 
-<p><a asp-action="Create" class= "btn btn-primary">Nueva Reserva</a></p>
+<p><a asp-action="Create" class="btn btn-primary">Nueva Reserva</a></p>
+<a asp-action="Vigentes" class="btn btn-outline-success mb-3">
+    Reservas vigentes
+</a>
 
 <table class="table">
     <thead>
@@ -36,14 +39,12 @@
                     }
                 </td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.IdReserva"
-                        class="btn btn-sm btn-outline-secondary me-2">
+                    <a asp-action="Details" asp-route-id="@item.IdReserva" class="btn btn-sm btn-outline-secondary me-2">
                         Ver
                     </a>
                     @if (item.Estado)
                     {
-                        <a asp-action="Edit" asp-route-id="@item.IdReserva"
-                            class="btn btn-sm btn-outline-primary me-2">
+                        <a asp-action="Edit" asp-route-id="@item.IdReserva" class="btn btn-sm btn-outline-primary me-2">
                             Editar
                         </a>
                         <form asp-action="Delete" asp-route-id="@item.IdReserva" method="post" style="display:inline">

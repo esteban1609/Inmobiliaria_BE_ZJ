@@ -1,0 +1,89 @@
+@model IEnumerable<Inmobiliaria_BarrosoEsteban.Models.Reserva>
+
+<div class="container mt-4">
+
+    <div class="mb-4">
+
+        <h2 class="fw-bold">
+            Reservas vigentes
+        </h2>
+
+        <p class="text-muted">
+            Reservas que se encuentran vigentes
+            a la fecha actual.
+        </p>
+
+    </div>
+
+
+    @if (Model.Any())
+    {
+        <table class="table table-hover">
+
+            <thead>
+
+                <tr>
+                    <th>Inquilino</th>
+                    <th>Inmueble</th>
+                    <th>Monto/día</th>
+                    <th>Desde</th>
+                    <th>Hasta</th>
+                    <th>Estado</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>
+                            @item.Inquilino?.Nombre
+                            @item.Inquilino?.Apellido
+                        </td>
+
+                        <td>
+                            @item.Inmueble?.Direccion
+                        </td>
+
+                        <td>
+                            @item.MontoDia.ToString("C")
+                        </td>
+
+                        <td>
+                            @item.FechaDesde.ToString("dd/MM/yyyy")
+                        </td>
+
+                        <td>
+                            @item.FechaHasta.ToString("dd/MM/yyyy")
+                        </td>
+
+                        <td>
+                            <span class="badge bg-success">
+                                Vigente
+                            </span>
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            No hay reservas vigentes en este momento.
+        </div>
+    }
+
+
+    <a asp-action="Index"
+       class="btn btn-outline-secondary">
+        Volver a Reservas
+    </a>
+
+</div>

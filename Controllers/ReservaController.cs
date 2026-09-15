@@ -33,6 +33,16 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             return View(lista);
         }
 
+
+        //Reservas Vigentes
+        public IActionResult Vigentes()
+        {
+            var lista =
+                repositorio.ListarVigentes();
+
+            return View(lista);
+        }
+
         // GET: Reserva/Details/5
         public IActionResult Details(int id)
         {
@@ -52,7 +62,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         // POST: Reserva/Create
         [HttpPost]
-        [Authorize(Roles ="Administrador")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult Create(Reserva r)
         {
             if (!ModelState.IsValid)
@@ -77,7 +87,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         // POST: Reserva/Edit/5
         [HttpPost]
-        [Authorize(Roles ="Administrador")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult Edit(int id, Reserva r)
         {
             if (!ModelState.IsValid)
@@ -102,7 +112,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         // POST: Reserva/Delete/5 (baja lógica)
         [HttpPost, ActionName("Delete")]
-        [Authorize(Roles ="Administrador")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult DeleteConfirmed(int id)
         {
             repositorio.Baja(id);
@@ -111,7 +121,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         // POST: Reserva/Reactivar/5
         [HttpPost]
-        [Authorize(Roles ="Administrador")]
+        [Authorize(Roles = "Administrador")]
         public IActionResult Reactivar(int id)
         {
             repositorio.Reactivar(id);
