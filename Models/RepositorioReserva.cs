@@ -9,69 +9,77 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
     {
     }
 
-    public int Alta(Reserva r)
+    // Alta ahora recibe también quién la crea
+public int Alta(Reserva r, int idUsuarioCreador)
+{
+    int res = -1;
+    using (MySqlConnection connection = new MySqlConnection(connectionString))
     {
-        int res = -1;
-        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        string sql = @"INSERT INTO reserva 
+            (id_inquilino, id_inmueble, monto_dia, fecha_desde, fecha_hasta, id_usuario_creador)
+            VALUES (@idInquilino, @idInmueble, @montoDia, @fechaDesde, @fechaHasta, @idUsuarioCreador);";
+ 
+        using (MySqlCommand command = new MySqlCommand(sql, connection))
         {
-            string sql = @"INSERT INTO reserva 
-                (id_inquilino, id_inmueble, monto_dia, fecha_desde, fecha_hasta)
-                VALUES (@idInquilino, @idInmueble, @montoDia, @fechaDesde, @fechaHasta);
-                SELECT LAST_INSERT_ID();";
-
-            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            command.Parameters.AddWithValue("@idInquilino", r.IdInquilino);
+            command.Parameters.AddWithValue("@idInmueble", r.IdInmueble);
+            command.Parameters.AddWithValue("@montoDia", r.MontoDia);
+            command.Parameters.AddWithValue("@fechaDesde", r.FechaDesde);
+            command.Parameters.AddWithValue("@fechaHasta", r.FechaHasta);
+            command.Parameters.AddWithValue("@idUsuarioCreador", idUsuarioCreador);
+ 
+            connection.Open();
+            command.ExecuteNonQuery();
+ 
+            using (MySqlCommand cmdId = new MySqlCommand("SELECT LAST_INSERT_ID();", connection))
             {
-                command.Parameters.AddWithValue("@idInquilino", r.IdInquilino);
-                command.Parameters.AddWithValue("@idInmueble", r.IdInmueble);
-                command.Parameters.AddWithValue("@montoDia", r.MontoDia);
-                command.Parameters.AddWithValue("@fechaDesde", r.FechaDesde);
-                command.Parameters.AddWithValue("@fechaHasta", r.FechaHasta);
-
-                connection.Open();
-                res = Convert.ToInt32(command.ExecuteScalar());
+                res = Convert.ToInt32(cmdId.ExecuteScalar());
                 r.IdReserva = res;
             }
         }
-        return res;
     }
-
-    // Baja lógica
-    public int Baja(int id)
+    return res;
+}
+ 
+// Baja ahora registra quién la terminó
+public int Baja(int id, int idUsuarioTerminador)
+{
+    int res = -1;
+    using (MySqlConnection connection = new MySqlConnection(connectionString))
     {
-        int res = -1;
-        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        string sql = @"UPDATE reserva SET estado = FALSE, id_usuario_terminador = @idUsuarioTerminador 
+            WHERE id_reserva = @id;";
+ 
+        using (MySqlCommand command = new MySqlCommand(sql, connection))
         {
-            string sql = @"UPDATE reserva SET estado = FALSE WHERE id_reserva = @id;";
-
-            using (MySqlCommand command = new MySqlCommand(sql, connection))
-            {
-                command.Parameters.AddWithValue("@id", id);
-
-                connection.Open();
-                res = command.ExecuteNonQuery();
-            }
+            command.Parameters.AddWithValue("@idUsuarioTerminador", idUsuarioTerminador);
+            command.Parameters.AddWithValue("@id", id);
+ 
+            connection.Open();
+            res = command.ExecuteNonQuery();
         }
-        return res;
     }
+    return res;
+}
 
     public int Reactivar(int id)
+{
+    int res = -1;
+    using (MySqlConnection connection = new MySqlConnection(connectionString))
     {
-        int res = -1;
-        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        string sql = @"UPDATE reserva SET estado = TRUE, id_usuario_terminador = NULL 
+            WHERE id_reserva = @id;";
+
+        using (MySqlCommand command = new MySqlCommand(sql, connection))
         {
-            string sql = @"UPDATE reserva SET estado = TRUE WHERE id_reserva = @id;";
+            command.Parameters.AddWithValue("@id", id);
 
-            using (MySqlCommand command = new MySqlCommand(sql, connection))
-            {
-                command.Parameters.AddWithValue("@id", id);
-
-                connection.Open();
-                res = command.ExecuteNonQuery();
-            }
+            connection.Open();
+            res = command.ExecuteNonQuery();
         }
-        return res;
     }
-
+    return res;
+}
     public int Modificacion(Reserva r)
     {
         int res = -1;
@@ -108,12 +116,17 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             string sql = @"SELECT r.id_reserva, r.id_inquilino, r.id_inmueble, r.monto_dia, 
-                    r.fecha_desde, r.fecha_hasta, r.estado,
-                    CONCAT(i.nombre, ' ', i.apellido) AS nombre_inquilino,
-                    m.direccion AS direccion_inmueble
-                FROM reserva r
-                INNER JOIN inquilino i ON r.id_inquilino = i.id_inquilino
-                INNER JOIN inmueble m ON r.id_inmueble = m.id_inmueble;";
+                            r.fecha_desde, r.fecha_hasta, r.estado,
+                            r.id_usuario_creador, r.id_usuario_terminador,
+                            CONCAT(i.nombre, ' ', i.apellido) AS nombre_inquilino,
+                            m.direccion AS direccion_inmueble,
+                            CONCAT(uc.nombre, ' ', uc.apellido) AS nombre_usuario_creador,
+                            CONCAT(ut.nombre, ' ', ut.apellido) AS nombre_usuario_terminador
+                            FROM reserva r
+                            INNER JOIN inquilino i ON r.id_inquilino = i.id_inquilino
+                            INNER JOIN inmueble m ON r.id_inmueble = m.id_inmueble
+                            LEFT JOIN usuario uc ON r.id_usuario_creador = uc.id_usuario
+                            LEFT JOIN usuario ut ON r.id_usuario_terminador = ut.id_usuario";
 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
@@ -608,13 +621,18 @@ public IList<Inmueble> SinReservasUltimosDias(int dias)
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             string sql = @"SELECT r.id_reserva, r.id_inquilino, r.id_inmueble, r.monto_dia, 
-                    r.fecha_desde, r.fecha_hasta, r.estado,
-                    CONCAT(i.nombre, ' ', i.apellido) AS nombre_inquilino,
-                    m.direccion AS direccion_inmueble
-                FROM reserva r
-                INNER JOIN inquilino i ON r.id_inquilino = i.id_inquilino
-                INNER JOIN inmueble m ON r.id_inmueble = m.id_inmueble
-                WHERE r.id_reserva = @id;";
+                        r.fecha_desde, r.fecha_hasta, r.estado,
+                        r.id_usuario_creador, r.id_usuario_terminador,
+                        CONCAT(i.nombre, ' ', i.apellido) AS nombre_inquilino,
+                        m.direccion AS direccion_inmueble,
+                        CONCAT(uc.nombre, ' ', uc.apellido) AS nombre_usuario_creador,
+                        CONCAT(ut.nombre, ' ', ut.apellido) AS nombre_usuario_terminador
+                        FROM reserva r
+                        INNER JOIN inquilino i ON r.id_inquilino = i.id_inquilino
+                        INNER JOIN inmueble m ON r.id_inmueble = m.id_inmueble
+                        LEFT JOIN usuario uc ON r.id_usuario_creador = uc.id_usuario
+                        LEFT JOIN usuario ut ON r.id_usuario_terminador = ut.id_usuario
+                        WHERE r.id_reserva = @id;";
 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
@@ -635,18 +653,22 @@ public IList<Inmueble> SinReservasUltimosDias(int dias)
 
     // Método privado para no repetir el mapeo en Listar y ObtenerPorId
     private Reserva MapearReserva(MySqlDataReader reader)
+{
+    return new Reserva
     {
-        return new Reserva
-        {
-            IdReserva = reader.GetInt32(reader.GetOrdinal("id_reserva")),
-            IdInquilino = reader.GetInt32(reader.GetOrdinal("id_inquilino")),
-            IdInmueble = reader.GetInt32(reader.GetOrdinal("id_inmueble")),
-            MontoDia = reader.GetDecimal(reader.GetOrdinal("monto_dia")),
-            FechaDesde = reader.GetDateTime(reader.GetOrdinal("fecha_desde")),
-            FechaHasta = reader.GetDateTime(reader.GetOrdinal("fecha_hasta")),
-            Estado = reader.GetBoolean(reader.GetOrdinal("estado")),
-            NombreInquilino = reader.GetString(reader.GetOrdinal("nombre_inquilino")),
-            DireccionInmueble = reader.GetString(reader.GetOrdinal("direccion_inmueble"))
-        };
-    }
+        IdReserva = reader.GetInt32(reader.GetOrdinal("id_reserva")),
+        IdInquilino = reader.GetInt32(reader.GetOrdinal("id_inquilino")),
+        IdInmueble = reader.GetInt32(reader.GetOrdinal("id_inmueble")),
+        MontoDia = reader.GetDecimal(reader.GetOrdinal("monto_dia")),
+        FechaDesde = reader.GetDateTime(reader.GetOrdinal("fecha_desde")),
+        FechaHasta = reader.GetDateTime(reader.GetOrdinal("fecha_hasta")),
+        Estado = reader.GetBoolean(reader.GetOrdinal("estado")),
+        NombreInquilino = reader.GetString(reader.GetOrdinal("nombre_inquilino")),
+        DireccionInmueble = reader.GetString(reader.GetOrdinal("direccion_inmueble")),
+        IdUsuarioCreador = reader.IsDBNull(reader.GetOrdinal("id_usuario_creador")) ? null : reader.GetInt32(reader.GetOrdinal("id_usuario_creador")),
+        IdUsuarioTerminador = reader.IsDBNull(reader.GetOrdinal("id_usuario_terminador")) ? null : reader.GetInt32(reader.GetOrdinal("id_usuario_terminador")),
+        NombreUsuarioCreador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_creador")) ? null : reader.GetString(reader.GetOrdinal("nombre_usuario_creador")),
+        NombreUsuarioTerminador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_terminador")) ? null : reader.GetString(reader.GetOrdinal("nombre_usuario_terminador"))
+    };
+}
 }

@@ -17,9 +17,20 @@
     <dd class="col-sm-9">@(Model.Estado ? "Activa" : "Inactiva")</dd>
 </dl>
 
+@if (User.IsInRole("Administrador"))
+{
+    <div class="card mb-3">
+        <div class="card-header">Auditoría</div>
+        <div class="card-body">
+            <p><strong>Creada por:</strong> @(Model.NombreUsuarioCreador ?? "-")</p>
+            <p><strong>Terminada por:</strong> @(Model.NombreUsuarioTerminador ?? "-- (sigue activa) --")</p>
+        </div>
+    </div>
+}
+
 <h3>Pagos</h3>
 
-<p><a asp-controller="Pago" asp-action="Create" asp-route-idReserva="@Model.IdReserva" class= "btn btn-primary">Cargar pago</a></p>
+<p><a asp-controller="Pago" asp-action="Create" asp-route-idReserva="@Model.IdReserva">Cargar pago</a></p>
 
 <table class="table">
     <thead>
@@ -28,6 +39,11 @@
             <th>Fecha</th>
             <th>Importe</th>
             <th>Estado</th>
+            @if (User.IsInRole("Administrador"))
+            {
+                <th>Creado por</th>
+                <th>Anulado por</th>
+            }
         </tr>
     </thead>
     <tbody>
@@ -38,11 +54,16 @@
                 <td>@pago.FechaPago.ToShortDateString()</td>
                 <td>@pago.Importe.ToString("C")</td>
                 <td>@(pago.Estado ? "Activo" : "Anulado")</td>
+                @if (User.IsInRole("Administrador"))
+                {
+                    <td>@(pago.NombreUsuarioCreador ?? "-")</td>
+                    <td>@(pago.NombreUsuarioAnulador ?? "-")</td>
+                }
             </tr>
         }
     </tbody>
 </table>
 
-<p><a asp-controller="Pago" asp-action="Index" asp-route-idReserva="@Model.IdReserva" class= "btn btn-primary">Ver todos los pagos</a></p>
+<p><a asp-controller="Pago" asp-action="Index" asp-route-idReserva="@Model.IdReserva">Ver todos los pagos</a></p>
 
-<a asp-action="Index" class= "btn btn-primary">Volver al listado de reservas</a>
+<a asp-action="Index">Volver al listado de reservas</a>

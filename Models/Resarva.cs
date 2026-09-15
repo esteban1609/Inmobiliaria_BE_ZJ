@@ -49,6 +49,12 @@ namespace Inmobiliaria_BarrosoEsteban.Models
 
         [Display(Name = "Dirección Inmueble")]
         public string? DireccionInmueble { get; set; }
+
+        // Auditoría -- solo se muestra a Administrador
+        public int? IdUsuarioCreador { get; set; }
+        public int? IdUsuarioTerminador { get; set; }
+        public string? NombreUsuarioCreador { get; set; }
+        public string? NombreUsuarioTerminador { get; set; }
     }
 }
 

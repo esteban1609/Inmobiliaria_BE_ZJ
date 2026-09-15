@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Inmobiliaria_BarrosoEsteban.Models;
@@ -14,22 +15,19 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             this.repositorio = repositorio;
         }
 
-        // GET: Pago?idReserva=5
+        private int IdUsuarioActual => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
         public IActionResult Index(int idReserva)
         {
             ViewBag.IdReserva = idReserva;
-            var lista = repositorio.ListarPorReserva(idReserva);
-            return View(lista);
+            return View(repositorio.ListarPorReserva(idReserva));
         }
 
-        // GET: Pago/Create?idReserva=5
         public IActionResult Create(int idReserva)
         {
-            var pago = new Pago { IdReserva = idReserva };
-            return View(pago);
+            return View(new Pago { IdReserva = idReserva });
         }
 
-        // POST: Pago/Create
         [HttpPost]
         public IActionResult Create(Pago p)
         {
@@ -38,28 +36,24 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
                 return View(p);
             }
 
-            repositorio.Alta(p);
+            repositorio.Alta(p, IdUsuarioActual);
             return RedirectToAction(nameof(Index), new { idReserva = p.IdReserva });
         }
 
-        // GET: Pago/Edit/5
         public IActionResult Edit(int id)
         {
             var p = repositorio.ObtenerPorId(id);
             if (p == null) return NotFound();
-
             return View(p);
         }
 
-        // POST: Pago/Edit/5
         [HttpPost]
         public IActionResult Edit(int id, string concepto)
         {
             if (string.IsNullOrWhiteSpace(concepto))
             {
                 ModelState.AddModelError("Concepto", "El concepto es obligatorio");
-                var p = repositorio.ObtenerPorId(id);
-                return View(p);
+                return View(repositorio.ObtenerPorId(id));
             }
 
             repositorio.ModificarConcepto(id, concepto);
@@ -68,23 +62,20 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             return RedirectToAction(nameof(Index), new { idReserva = pago?.IdReserva });
         }
 
-        // GET: Pago/Anular/5 -- SOLO Administrador
         [Authorize(Roles = "Administrador")]
         public IActionResult Anular(int id)
         {
             var p = repositorio.ObtenerPorId(id);
             if (p == null) return NotFound();
-
             return View(p);
         }
 
-        // POST: Pago/Anular/5 -- SOLO Administrador
         [HttpPost, ActionName("Anular")]
         [Authorize(Roles = "Administrador")]
         public IActionResult AnularConfirmado(int id)
         {
             var p = repositorio.ObtenerPorId(id);
-            repositorio.Anular(id);
+            repositorio.Anular(id, IdUsuarioActual);
             return RedirectToAction(nameof(Index), new { idReserva = p?.IdReserva });
         }
     }

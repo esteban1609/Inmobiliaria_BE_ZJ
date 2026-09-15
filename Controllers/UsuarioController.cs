@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Inmobiliaria_BarrosoEsteban.Models;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Inmobiliaria_BarrosoEsteban.Controllers
 {
@@ -10,11 +11,13 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
     public class UsuarioController : Controller
     {
         private readonly IRepositorioUsuario repositorio;
+        private readonly IWebHostEnvironment environment;
         private readonly PasswordHasher<Usuario> hasher = new PasswordHasher<Usuario>();
 
-        public UsuarioController(IRepositorioUsuario repositorio)
+        public UsuarioController(IRepositorioUsuario repositorio, IWebHostEnvironment environment)
         {
             this.repositorio = repositorio;
+            this.environment = environment;
         }
 
         // ===================== GESTIÓN DE OTROS USUARIOS (SOLO ADMINISTRADOR) =====================
@@ -96,14 +99,45 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         // POST: Usuario/MiPerfil (solo nombre/apellido/avatar -- NO email ni rol)
         [HttpPost]
-        public IActionResult MiPerfil(Usuario u)
+public IActionResult MiPerfil(Usuario u, IFormFile? avatarFile)
+{
+    int id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    u.IdUsuario = id;
+ 
+    if (avatarFile != null && avatarFile.Length > 0)
+    {
+        // Validar que sea una imagen por extensión
+        var extensionesPermitidas = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+        var extension = Path.GetExtension(avatarFile.FileName).ToLowerInvariant();
+ 
+        if (!extensionesPermitidas.Contains(extension))
         {
-            int id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            u.IdUsuario = id; // fuerza el id de la sesión, ignora cualquier otro id que llegue del form
-
-            repositorio.ModificarPerfilPropio(u);
-            return RedirectToAction(nameof(MiPerfil));
+            ModelState.AddModelError(string.Empty, "Solo se permiten imágenes (jpg, png, gif)");
+            return View(u);
         }
+ 
+        // Nombre único para no pisar archivos de otros usuarios
+        string nombreArchivo = $"avatar_{id}_{Guid.NewGuid()}{extension}";
+        string carpetaAvatares = Path.Combine(environment.WebRootPath, "uploads", "avatars");
+ 
+        if (!Directory.Exists(carpetaAvatares))
+            Directory.CreateDirectory(carpetaAvatares);
+ 
+        string rutaCompleta = Path.Combine(carpetaAvatares, nombreArchivo);
+ 
+        using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+        {
+            avatarFile.CopyTo(stream);
+        }
+ 
+        u.Avatar = $"/uploads/avatars/{nombreArchivo}"; // ruta pública, relativa a wwwroot
+    }
+    // Si no subió archivo nuevo, u.Avatar ya trae el valor anterior 
+    // porque la vista lo manda en un <input type="hidden" asp-for="Avatar" />
+ 
+    repositorio.ModificarPerfilPropio(u);
+    return RedirectToAction(nameof(MiPerfil));
+}
 
         // GET: Usuario/CambiarClave
         public IActionResult CambiarClave()

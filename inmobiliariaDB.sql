@@ -127,6 +127,21 @@ CREATE TABLE usuario (
     estado           BOOLEAN NOT NULL DEFAULT TRUE
 );
  
+ -- =========================================================
+-- Auditoría: Reserva y Pago
+-- =========================================================
+ 
+ALTER TABLE reserva
+    ADD COLUMN id_usuario_creador INT NULL,
+    ADD COLUMN id_usuario_terminador INT NULL,
+    ADD CONSTRAINT fk_reserva_usuario_creador FOREIGN KEY (id_usuario_creador) REFERENCES usuario(id_usuario),
+    ADD CONSTRAINT fk_reserva_usuario_terminador FOREIGN KEY (id_usuario_terminador) REFERENCES usuario(id_usuario);
+ 
+ALTER TABLE pago
+    ADD COLUMN id_usuario_creador INT NULL,
+    ADD COLUMN id_usuario_anulador INT NULL,
+    ADD CONSTRAINT fk_pago_usuario_creador FOREIGN KEY (id_usuario_creador) REFERENCES usuario(id_usuario),
+    ADD CONSTRAINT fk_pago_usuario_anulador FOREIGN KEY (id_usuario_anulador) REFERENCES usuario(id_usuario);
 
 -- =========================================================
 -- Datos iniciales de prueba

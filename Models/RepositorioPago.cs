@@ -1,32 +1,33 @@
 using Inmobiliaria_BarrosoEsteban.Models;
 using MySqlConnector;
-
+ 
 namespace Inmobiliaria_BarrosoEsteban;
-
+ 
 public class RepositorioPago : RepositorioBase, IRepositorioPago
 {
     public RepositorioPago(IConfiguration configuration) : base(configuration)
     {
     }
-
-    public int Alta(Pago p)
+ 
+    public int Alta(Pago p, int idUsuarioCreador)
     {
         int res = -1;
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string sql = @"INSERT INTO pago (id_reserva, concepto, fecha_pago, importe)
-                VALUES (@idReserva, @concepto, @fechaPago, @importe);";
-
+            string sql = @"INSERT INTO pago (id_reserva, concepto, fecha_pago, importe, id_usuario_creador)
+                VALUES (@idReserva, @concepto, @fechaPago, @importe, @idUsuarioCreador);";
+ 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@idReserva", p.IdReserva);
                 command.Parameters.AddWithValue("@concepto", p.Concepto);
                 command.Parameters.AddWithValue("@fechaPago", p.FechaPago);
                 command.Parameters.AddWithValue("@importe", p.Importe);
-
+                command.Parameters.AddWithValue("@idUsuarioCreador", idUsuarioCreador);
+ 
                 connection.Open();
                 command.ExecuteNonQuery();
-
+ 
                 using (MySqlCommand cmdId = new MySqlCommand("SELECT LAST_INSERT_ID();", connection))
                 {
                     res = Convert.ToInt32(cmdId.ExecuteScalar());
@@ -36,61 +37,65 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
         }
         return res;
     }
-
-    // Baja lógica -> cambia a "anulado", pero el registro sigue existiendo y se sigue listando
-    public int Anular(int id)
+ 
+    public int Anular(int id, int idUsuarioAnulador)
     {
         int res = -1;
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string sql = @"UPDATE pago SET estado = FALSE WHERE id_pago = @id;";
-
+            string sql = @"UPDATE pago SET estado = FALSE, id_usuario_anulador = @idUsuarioAnulador 
+                WHERE id_pago = @id;";
+ 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
+                command.Parameters.AddWithValue("@idUsuarioAnulador", idUsuarioAnulador);
                 command.Parameters.AddWithValue("@id", id);
-
+ 
                 connection.Open();
                 res = command.ExecuteNonQuery();
             }
         }
         return res;
     }
-
-    // Según la narrativa: al editar un pago, SOLO se puede cambiar el concepto
-    // (no el monto ni la fecha), por eso no existe un "Modificacion" genérico como en las otras entidades.
+ 
     public int ModificarConcepto(int id, string concepto)
     {
         int res = -1;
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             string sql = @"UPDATE pago SET concepto = @concepto WHERE id_pago = @id;";
-
+ 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@concepto", concepto);
                 command.Parameters.AddWithValue("@id", id);
-
+ 
                 connection.Open();
                 res = command.ExecuteNonQuery();
             }
         }
         return res;
     }
-
+ 
     public List<Pago> ListarPorReserva(int idReserva)
     {
         List<Pago> lista = new List<Pago>();
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string sql = @"SELECT id_pago, id_reserva, concepto, fecha_pago, importe, estado
-                FROM pago
-                WHERE id_reserva = @idReserva
-                ORDER BY fecha_pago;";
-
+            string sql = @"SELECT p.id_pago, p.id_reserva, p.concepto, p.fecha_pago, p.importe, p.estado,
+                    p.id_usuario_creador, p.id_usuario_anulador,
+                    CONCAT(uc.nombre, ' ', uc.apellido) AS nombre_usuario_creador,
+                    CONCAT(ua.nombre, ' ', ua.apellido) AS nombre_usuario_anulador
+                FROM pago p
+                LEFT JOIN usuario uc ON p.id_usuario_creador = uc.id_usuario
+                LEFT JOIN usuario ua ON p.id_usuario_anulador = ua.id_usuario
+                WHERE p.id_reserva = @idReserva
+                ORDER BY p.fecha_pago;";
+ 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@idReserva", idReserva);
-
+ 
                 connection.Open();
                 using (MySqlDataReader reader = command.ExecuteReader())
                 {
@@ -103,20 +108,25 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
         }
         return lista;
     }
-
+ 
     public Pago? ObtenerPorId(int id)
     {
         Pago? p = null;
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string sql = @"SELECT id_pago, id_reserva, concepto, fecha_pago, importe, estado
-                FROM pago
-                WHERE id_pago = @id;";
-
+            string sql = @"SELECT p.id_pago, p.id_reserva, p.concepto, p.fecha_pago, p.importe, p.estado,
+                    p.id_usuario_creador, p.id_usuario_anulador,
+                    CONCAT(uc.nombre, ' ', uc.apellido) AS nombre_usuario_creador,
+                    CONCAT(ua.nombre, ' ', ua.apellido) AS nombre_usuario_anulador
+                FROM pago p
+                LEFT JOIN usuario uc ON p.id_usuario_creador = uc.id_usuario
+                LEFT JOIN usuario ua ON p.id_usuario_anulador = ua.id_usuario
+                WHERE p.id_pago = @id;";
+ 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@id", id);
-
+ 
                 connection.Open();
                 using (MySqlDataReader reader = command.ExecuteReader())
                 {
@@ -129,7 +139,7 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
         }
         return p;
     }
-
+ 
     private Pago MapearPago(MySqlDataReader reader)
     {
         return new Pago
@@ -139,7 +149,11 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
             Concepto = reader.GetString(reader.GetOrdinal("concepto")),
             FechaPago = reader.GetDateTime(reader.GetOrdinal("fecha_pago")),
             Importe = reader.GetDecimal(reader.GetOrdinal("importe")),
-            Estado = reader.GetBoolean(reader.GetOrdinal("estado"))
+            Estado = reader.GetBoolean(reader.GetOrdinal("estado")),
+            IdUsuarioCreador = reader.IsDBNull(reader.GetOrdinal("id_usuario_creador")) ? null : reader.GetInt32(reader.GetOrdinal("id_usuario_creador")),
+            IdUsuarioAnulador = reader.IsDBNull(reader.GetOrdinal("id_usuario_anulador")) ? null : reader.GetInt32(reader.GetOrdinal("id_usuario_anulador")),
+            NombreUsuarioCreador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_creador")) ? null : reader.GetString(reader.GetOrdinal("nombre_usuario_creador")),
+            NombreUsuarioAnulador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_anulador")) ? null : reader.GetString(reader.GetOrdinal("nombre_usuario_anulador"))
         };
     }
 }

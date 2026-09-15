@@ -35,5 +35,11 @@ namespace Inmobiliaria_BarrosoEsteban.Models
         // Solo para mostrar en las vistas
         public string? NombreInquilino { get; set; }
         public string? DireccionInmueble { get; set; }
+
+        // Auditoría -- solo se muestra a Administrador
+        public int? IdUsuarioCreador { get; set; }
+        public int? IdUsuarioAnulador { get; set; }
+        public string? NombreUsuarioCreador { get; set; }
+        public string? NombreUsuarioAnulador { get; set; }
     }
 }
