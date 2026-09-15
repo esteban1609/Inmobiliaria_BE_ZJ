@@ -1,0 +1,179 @@
+@model IEnumerable<Inmobiliaria_BarrosoEsteban.Models.Inmueble>
+
+@{
+    ViewData["Title"] = "Inmuebles disponibles";
+}
+
+<div class="container mt-4">
+
+    <div class="mb-4">
+        <h2 class="fw-bold">
+            Consultar disponibilidad
+        </h2>
+
+        <p class="text-muted">
+            Seleccione las fechas de inicio y fin de la reserva
+            para consultar los inmuebles disponibles.
+        </p>
+    </div>
+
+
+    <!-- FORMULARIO DE FECHAS -->
+    <form asp-action="Disponibles"
+          method="get"
+          class="mb-4">
+
+        <div class="row">
+
+            <div class="col-md-3">
+
+                <label class="form-label">
+                    Fecha desde
+                </label>
+
+                <input type="date"
+                       name="fechaDesde"
+                       value="@(ViewBag.FechaDesde?.ToString("yyyy-MM-dd"))"
+                       class="form-control"
+                       required />
+
+            </div>
+
+
+            <div class="col-md-3">
+
+                <label class="form-label">
+                    Fecha hasta
+                </label>
+
+                <input type="date"
+                       name="fechaHasta"
+                       value="@(ViewBag.FechaHasta?.ToString("yyyy-MM-dd"))"
+                       class="form-control"
+                       required />
+
+            </div>
+
+
+            <div class="col-md-3 d-flex align-items-end">
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    Buscar disponibles
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+
+    <!-- ERROR DE FECHAS -->
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.Error
+        </div>
+    }
+
+
+    <!-- RESULTADOS -->
+    @if (ViewBag.FechaDesde != null &&
+         ViewBag.FechaHasta != null &&
+         ViewBag.Error == null)
+    {
+        <div class="mb-3">
+
+            <h5>
+                Inmuebles disponibles
+            </h5>
+
+            <p class="text-muted">
+                Desde:
+                <strong>
+                    @ViewBag.FechaDesde.ToString("dd/MM/yyyy")
+                </strong>
+
+                -
+
+                Hasta:
+                <strong>
+                    @ViewBag.FechaHasta.ToString("dd/MM/yyyy")
+                </strong>
+            </p>
+
+        </div>
+
+
+        @if (Model.Any())
+        {
+            <table class="table table-hover">
+
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Dirección</th>
+                        <th>Cupo</th>
+                        <th>Precio por día</th>
+                        <th>Propietario</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                @item.TipoInmueble?.Nombre
+                            </td>
+
+                            <td>
+                                @item.Direccion
+                            </td>
+
+                            <td>
+                                @item.Cupo
+                            </td>
+
+                            <td>
+                                $ @item.PrecioPorDia
+                            </td>
+
+                            <td>
+                                @item.Propietario?.Nombre
+                                @item.Propietario?.Apellido
+                            </td>
+
+                            <td>
+                                <span class="badge bg-success">
+                                    Disponible
+                                </span>
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                No existen inmuebles disponibles
+                para las fechas seleccionadas.
+            </div>
+        }
+    }
+
+
+    <a asp-action="Index"
+       class="btn btn-outline-secondary">
+        Volver a Reservas
+    </a>
+
+</div>

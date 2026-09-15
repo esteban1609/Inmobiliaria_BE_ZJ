@@ -324,6 +324,118 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         return lista;
     }
 
+    public IList<Inmueble> ListarInmueblesDisponibles(
+    DateTime fechaDesde,
+    DateTime fechaHasta)
+    {
+        var lista = new List<Inmueble>();
+
+        using var connection =
+            new MySqlConnection(connectionString);
+
+        string sql = @"
+        SELECT
+            i.id_inmueble,
+            i.direccion,
+            i.cupo,
+            i.precio_por_dia,
+            i.estado,
+            i.id_propietario,
+            i.id_tipo,
+
+            p.nombre AS propietario_nombre,
+            p.apellido AS propietario_apellido,
+
+            t.Nombre AS tipo_nombre
+
+        FROM inmueble i
+
+        INNER JOIN propietario p
+            ON i.id_propietario = p.id_propietario
+
+        INNER JOIN TipoInmueble t
+            ON i.id_tipo = t.id_tipo
+
+        WHERE i.estado = TRUE
+
+        AND NOT EXISTS
+        (
+            SELECT 1
+            FROM reserva r
+
+            WHERE r.id_inmueble = i.id_inmueble
+              AND r.estado = TRUE
+
+              AND r.fecha_desde <= @fechaHasta
+              AND r.fecha_hasta >= @fechaDesde
+        )
+
+        ORDER BY i.direccion;";
+
+        using var command =
+            new MySqlCommand(sql, connection);
+
+        command.Parameters.AddWithValue("@fechaDesde",fechaDesde);
+
+        command.Parameters.AddWithValue("@fechaHasta",fechaHasta);
+
+        connection.Open();
+
+        using var reader =command.ExecuteReader();
+
+        while (reader.Read())
+        {
+            var inmueble = new Inmueble
+            {
+                IdInmueble =
+                    reader.GetInt32("id_inmueble"),
+
+                Direccion =
+                    reader.GetString("direccion"),
+
+                Cupo =
+                    reader.GetInt32("cupo"),
+
+                PrecioPorDia =
+                    reader.GetDecimal("precio_por_dia"),
+
+                Estado =
+                    reader.GetBoolean("estado"),
+
+                IdPropietario =
+                    reader.GetInt32("id_propietario"),
+
+                id_tipo =
+                    reader.GetInt32("id_tipo"),
+
+                Propietario = new Propietario
+                {
+                    IdPropietario =
+                        reader.GetInt32("id_propietario"),
+
+                    Nombre =
+                        reader.GetString("propietario_nombre"),
+
+                    Apellido =
+                        reader.GetString("propietario_apellido")
+                },
+
+                TipoInmueble = new TipoInmueble
+                {
+                    id_tipo =
+                        reader.GetInt32("id_tipo"),
+
+                    Nombre =
+                        reader.GetString("tipo_nombre")
+                }
+            };
+
+            lista.Add(inmueble);
+        }
+
+        return lista;
+    }
+
     public Reserva? ObtenerPorId(int id)
     {
         Reserva? r = null;

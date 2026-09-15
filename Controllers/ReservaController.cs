@@ -59,6 +59,32 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             return View(lista);
         }
 
+        //Reservas disponibles
+        public IActionResult Disponibles(DateTime? fechaDesde,DateTime? fechaHasta)
+        {
+            IList<Inmueble> lista =
+                new List<Inmueble>();
+
+            if (fechaDesde.HasValue &&
+                fechaHasta.HasValue)
+            {
+                if (fechaHasta.Value < fechaDesde.Value)
+                {
+                    ViewBag.Error ="La fecha hasta no puede ser anterior a la fecha desde.";
+                }
+                else
+                {
+                    lista =
+                        repositorio.ListarInmueblesDisponibles(fechaDesde.Value,fechaHasta.Value);
+                }
+            }
+
+            ViewBag.FechaDesde = fechaDesde;
+            ViewBag.FechaHasta = fechaHasta;
+
+            return View(lista);
+        }
+
         // GET: Reserva/Details/5
         public IActionResult Details(int id)
         {
