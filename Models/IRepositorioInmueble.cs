@@ -7,10 +7,6 @@ namespace Inmobiliaria_BarrosoEsteban.Models
 
         IList<Inmueble> ListarPorPropietario(int idPropietario);
 
-        IList<Inmueble> MasReservadosUltimos365Dias();
-
-        IList<Inmueble> SinReservasUltimosDias(int dias);
-
         int Alta(Inmueble inmueble);
 
         Inmueble? ObtenerPorId(int id);
