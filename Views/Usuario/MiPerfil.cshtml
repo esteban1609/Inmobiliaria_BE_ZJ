@@ -3,24 +3,20 @@
 <div class="row justify-content-center mt-4">
     <div class="col-md-6">
         <div class="card shadow-sm">
-            <div class="card-body text-center">
-                <img src="@(string.IsNullOrEmpty(Model.Avatar) ? "/img/avatar-default.png" : Model.Avatar)"
-                     alt="Avatar" class="rounded-circle mb-3" style="width:120px; height:120px; object-fit:cover;" />
+            <div class="card-body">
+                <h3 class="card-title text-center mb-3">Editar perfil</h3>
 
-                <h3 class="card-title">@Model.Nombre @Model.Apellido</h3>
-                <p class="text-muted">
-                    <span class="badge bg-info text-dark">@Model.Rol</span>
-                </p>
-                <p class="text-muted">@Model.Email</p>
-
-                <hr />
-
-                <form asp-action="MiPerfil" method="post" enctype="multipart/form-data" class="text-start">
+                <form asp-action="MiPerfil" method="post" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <input type="hidden" asp-for="Email" />
                     <input type="hidden" asp-for="Rol" />
                     <input type="hidden" asp-for="IdUsuario" />
                     <input type="hidden" asp-for="Avatar" />
+
+                    <div class="text-center mb-3">
+                        <img src="@(string.IsNullOrEmpty(Model.Avatar) ? "/img/avatar-default.png" : Model.Avatar)"
+                             alt="Avatar" class="rounded-circle" style="width:100px; height:100px; object-fit:cover;" />
+                    </div>
 
                     <div class="mb-3">
                         <label asp-for="Nombre"></label>
@@ -42,7 +38,7 @@
 
                     <div class="d-flex justify-content-between">
                         <button type="submit" class="btn btn-primary">Guardar cambios</button>
-                        <a asp-action="CambiarClave" class="btn btn-outline-secondary">Cambiar contraseña</a>
+                        <a asp-action="Perfil" class="btn btn-outline-secondary">Cancelar</a>
                     </div>
                 </form>
             </div>

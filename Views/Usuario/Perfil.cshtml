@@ -1,0 +1,25 @@
+@model Usuario
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <img src="@(string.IsNullOrEmpty(Model.Avatar) ? "/img/avatar-default.png" : Model.Avatar)"
+                     alt="Avatar" class="rounded-circle mb-3" style="width:120px; height:120px; object-fit:cover;" />
+
+                <h3 class="card-title">@Model.Nombre @Model.Apellido</h3>
+                <p class="text-muted">
+                    <span class="badge bg-info text-dark">@Model.Rol</span>
+                </p>
+                <p class="text-muted">@Model.Email</p>
+
+                <hr />
+
+                <div class="d-flex justify-content-center gap-2">
+                    <a asp-action="MiPerfil" class="btn btn-primary">Editar perfil</a>
+                    <a asp-action="CambiarClave" class="btn btn-outline-secondary">Cambiar contraseña</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

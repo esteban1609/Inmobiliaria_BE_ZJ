@@ -136,7 +136,7 @@ public IActionResult MiPerfil(Usuario u, IFormFile? avatarFile)
     // porque la vista lo manda en un <input type="hidden" asp-for="Avatar" />
  
     repositorio.ModificarPerfilPropio(u);
-    return RedirectToAction(nameof(MiPerfil));
+    return RedirectToAction(nameof(Perfil));
 }
 
         // GET: Usuario/CambiarClave
@@ -163,7 +163,16 @@ public IActionResult MiPerfil(Usuario u, IFormFile? avatarFile)
             string nuevoHash = hasher.HashPassword(u, claveNueva);
             repositorio.ActualizarClave(id, nuevoHash);
 
-            return RedirectToAction(nameof(MiPerfil));
+            return RedirectToAction(nameof(Perfil));
+        }
+
+        // GET: Usuario/Perfil
+        public IActionResult Perfil()
+        {
+            int id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var u = repositorio.ObtenerPorId(id);
+            if (u == null) return NotFound();
+            return View(u);
         }
     }
 }
