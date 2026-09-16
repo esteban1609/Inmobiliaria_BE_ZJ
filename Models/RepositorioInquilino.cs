@@ -93,18 +93,24 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
         return res;
     }
 
-    public List<Inquilino> Listar()
+    public List<Inquilino> Listar(int paginaNro = 1, int tamPagina = 10)
     {
         List<Inquilino> lista = new List<Inquilino>();
 
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             string sql = @"SELECT id_inquilino, nombre, apellido, dni, telefono, email,estado
-                           FROM inquilino;";
+                           FROM inquilino
+                           ORDER BY id_inquilino
+                           LIMIT @tamPagina OFFSET @offset";
 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.CommandType = CommandType.Text;
+                int offset = (paginaNro - 1) * tamPagina;
+
+                command.Parameters.AddWithValue("@tamPagina", tamPagina);
+                command.Parameters.AddWithValue("@offset", offset);
 
                 connection.Open();
 
@@ -120,7 +126,7 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
                             Dni = reader.GetString(reader.GetOrdinal("dni")),
                             Telefono = reader.GetString(reader.GetOrdinal("telefono")),
                             Email = reader.GetString(reader.GetOrdinal("email")),
-                            Estado =reader.GetBoolean(reader.GetOrdinal("estado"))
+                            Estado = reader.GetBoolean(reader.GetOrdinal("estado"))
                         };
 
                         lista.Add(i);
@@ -172,57 +178,57 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
     }
 
     public int Reactivar(int id)
-{
-    int res = -1;
-    using (MySqlConnection connection = new MySqlConnection(connectionString))
     {
-        string sql = @"UPDATE inquiilino SET estado = TRUE WHERE id_inquilino = @id;";
-
-        using (MySqlCommand command = new MySqlCommand(sql, connection))
+        int res = -1;
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            command.Parameters.AddWithValue("@id", id);
-            connection.Open();
-            res = command.ExecuteNonQuery();
-        }
-    }
-    return res;
-}
+            string sql = @"UPDATE inquiilino SET estado = TRUE WHERE id_inquilino = @id;";
 
-public List<Inquilino> Buscar(string term)
-{
-    List<Inquilino> lista = new List<Inquilino>();
-    using (MySqlConnection connection = new MySqlConnection(connectionString))
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@id", id);
+                connection.Open();
+                res = command.ExecuteNonQuery();
+            }
+        }
+        return res;
+    }
+
+    public List<Inquilino> Buscar(string term)
     {
-        string sql = @"SELECT id_inquilino, dni, nombre, apellido, telefono, email, estado
+        List<Inquilino> lista = new List<Inquilino>();
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            string sql = @"SELECT id_inquilino, dni, nombre, apellido, telefono, email, estado
             FROM inquilino
             WHERE estado = TRUE
               AND (nombre LIKE @term OR apellido LIKE @term OR dni LIKE @term)
             ORDER BY apellido
-            LIMIT 20;";  
- 
-        using (MySqlCommand command = new MySqlCommand(sql, connection))
-        {
-            command.Parameters.AddWithValue("@term", $"%{term}%");
- 
-            connection.Open();
-            using (MySqlDataReader reader = command.ExecuteReader())
+            LIMIT 20;";
+
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
-                while (reader.Read())
+                command.Parameters.AddWithValue("@term", $"%{term}%");
+
+                connection.Open();
+                using (MySqlDataReader reader = command.ExecuteReader())
                 {
-                    lista.Add(new Inquilino
+                    while (reader.Read())
                     {
-                        IdInquilino = reader.GetInt32(reader.GetOrdinal("id_inquilino")),
-                        Dni = reader.GetString(reader.GetOrdinal("dni")),
-                        Nombre = reader.GetString(reader.GetOrdinal("nombre")),
-                        Apellido = reader.GetString(reader.GetOrdinal("apellido")),
-                        Telefono = reader.IsDBNull(reader.GetOrdinal("telefono")) ? null : reader.GetString(reader.GetOrdinal("telefono")),
-                        Email = reader.IsDBNull(reader.GetOrdinal("email")) ? null : reader.GetString(reader.GetOrdinal("email")),
-                        Estado = reader.GetBoolean(reader.GetOrdinal("estado"))
-                    });
+                        lista.Add(new Inquilino
+                        {
+                            IdInquilino = reader.GetInt32(reader.GetOrdinal("id_inquilino")),
+                            Dni = reader.GetString(reader.GetOrdinal("dni")),
+                            Nombre = reader.GetString(reader.GetOrdinal("nombre")),
+                            Apellido = reader.GetString(reader.GetOrdinal("apellido")),
+                            Telefono = reader.IsDBNull(reader.GetOrdinal("telefono")) ? null : reader.GetString(reader.GetOrdinal("telefono")),
+                            Email = reader.IsDBNull(reader.GetOrdinal("email")) ? null : reader.GetString(reader.GetOrdinal("email")),
+                            Estado = reader.GetBoolean(reader.GetOrdinal("estado"))
+                        });
+                    }
                 }
             }
         }
+        return lista;
     }
-    return lista;
-}
 }
