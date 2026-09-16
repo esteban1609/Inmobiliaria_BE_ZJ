@@ -529,5 +529,41 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
 
         return res;
     }
+    public List<Inmueble> Buscar(string term)
+    {
+        List<Inmueble> lista = new List<Inmueble>();
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            string sql = @"SELECT id_inmueble, direccion, cupo, precio_por_dia, estado
+                FROM inmueble
+                WHERE estado = TRUE
+                AND direccion LIKE @term
+                ORDER BY direccion
+                LIMIT 20;";
+    
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@term", $"%{term}%");
+    
+                connection.Open();
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lista.Add(new Inmueble
+                        {
+                            IdInmueble = reader.GetInt32(reader.GetOrdinal("id_inmueble")),
+                            Direccion = reader.GetString(reader.GetOrdinal("direccion")),
+                            Cupo = reader.GetInt32(reader.GetOrdinal("cupo")),
+                            PrecioPorDia = reader.GetDecimal(reader.GetOrdinal("precio_por_dia")),
+                            Estado = reader.GetBoolean(reader.GetOrdinal("estado"))
+                        });
+                    }
+                }
+            }
+        }
+        return lista;
+    }
+
 
 }

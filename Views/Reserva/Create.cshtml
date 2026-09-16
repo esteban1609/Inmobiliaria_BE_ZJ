@@ -7,17 +7,13 @@
 
     <div class="mb-3">
         <label asp-for="IdInquilino"></label>
-        <select asp-for="IdInquilino" class="form-control" asp-items="@(new SelectList(ViewBag.Inquilinos, "IdInquilino", "Nombre"))">
-            <option value="">-- Seleccione --</option>
-        </select>
+        <select id="IdInquilino" name="IdInquilino" class="form-control"></select>
         <span asp-validation-for="IdInquilino" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="IdInmueble"></label>
-        <select asp-for="IdInmueble" class="form-control" asp-items="@(new SelectList(ViewBag.Inmuebles, "IdInmueble", "Direccion"))">
-            <option value="">-- Seleccione --</option>
-        </select>
+        <select id="IdInmueble" name="IdInmueble" class="form-control"></select>
         <span asp-validation-for="IdInmueble" class="text-danger"></span>
     </div>
 
@@ -45,4 +41,33 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(function () {
+            $('#IdInquilino').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Buscar inquilino por nombre, apellido o DNI...',
+                minimumInputLength: 1,
+                ajax: {
+                    url: '/Inquilinos/BuscarJson',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) { return { term: params.term }; },
+                    processResults: function (data) { return data; }
+                }
+            });
+
+            $('#IdInmueble').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Buscar inmueble por dirección...',
+                minimumInputLength: 1,
+                ajax: {
+                    url: '/Inmueble/BuscarJson',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) { return { term: params.term }; },
+                    processResults: function (data) { return data; }
+                }
+            });
+        });
+    </script>
 }

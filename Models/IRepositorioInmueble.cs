@@ -17,5 +17,6 @@ namespace Inmobiliaria_BarrosoEsteban.Models
         int Baja(int id);
 
         int Reactivar(int id);
+        List<Inmueble> Buscar(string term);
     }
 }

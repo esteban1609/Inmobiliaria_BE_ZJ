@@ -187,4 +187,42 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
     }
     return res;
 }
+
+public List<Inquilino> Buscar(string term)
+{
+    List<Inquilino> lista = new List<Inquilino>();
+    using (MySqlConnection connection = new MySqlConnection(connectionString))
+    {
+        string sql = @"SELECT id_inquilino, dni, nombre, apellido, telefono, email, estado
+            FROM inquilino
+            WHERE estado = TRUE
+              AND (nombre LIKE @term OR apellido LIKE @term OR dni LIKE @term)
+            ORDER BY apellido
+            LIMIT 20;";  
+ 
+        using (MySqlCommand command = new MySqlCommand(sql, connection))
+        {
+            command.Parameters.AddWithValue("@term", $"%{term}%");
+ 
+            connection.Open();
+            using (MySqlDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    lista.Add(new Inquilino
+                    {
+                        IdInquilino = reader.GetInt32(reader.GetOrdinal("id_inquilino")),
+                        Dni = reader.GetString(reader.GetOrdinal("dni")),
+                        Nombre = reader.GetString(reader.GetOrdinal("nombre")),
+                        Apellido = reader.GetString(reader.GetOrdinal("apellido")),
+                        Telefono = reader.IsDBNull(reader.GetOrdinal("telefono")) ? null : reader.GetString(reader.GetOrdinal("telefono")),
+                        Email = reader.IsDBNull(reader.GetOrdinal("email")) ? null : reader.GetString(reader.GetOrdinal("email")),
+                        Estado = reader.GetBoolean(reader.GetOrdinal("estado"))
+                    });
+                }
+            }
+        }
+    }
+    return lista;
+}
 }

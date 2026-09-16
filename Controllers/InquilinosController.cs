@@ -96,6 +96,21 @@ namespace Inmobiliaria_.Net_Core.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
+        public JsonResult BuscarJson(string term)
+        {
+            var lista = repositorio.Buscar(term ?? "");
+        
+            var resultado = lista.Select(i => new
+            {
+                id = i.IdInquilino,
+                text = $"{i.Nombre} {i.Apellido} - DNI {i.Dni}"
+            });
+        
+            // Formato que Select2 espera: { results: [ { id, text }, ... ] }
+            return Json(new { results = resultado });
+        }
+
 
 
 
