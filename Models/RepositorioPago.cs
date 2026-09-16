@@ -1,14 +1,14 @@
 using Inmobiliaria_BarrosoEsteban.Models;
 using MySqlConnector;
- 
+
 namespace Inmobiliaria_BarrosoEsteban;
- 
+
 public class RepositorioPago : RepositorioBase, IRepositorioPago
 {
     public RepositorioPago(IConfiguration configuration) : base(configuration)
     {
     }
- 
+
     public int Alta(Pago p, int idUsuarioCreador)
     {
         int res = -1;
@@ -16,7 +16,7 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
         {
             string sql = @"INSERT INTO pago (id_reserva, concepto, fecha_pago, importe, id_usuario_creador)
                 VALUES (@idReserva, @concepto, @fechaPago, @importe, @idUsuarioCreador);";
- 
+
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@idReserva", p.IdReserva);
@@ -24,10 +24,10 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
                 command.Parameters.AddWithValue("@fechaPago", p.FechaPago);
                 command.Parameters.AddWithValue("@importe", p.Importe);
                 command.Parameters.AddWithValue("@idUsuarioCreador", idUsuarioCreador);
- 
+
                 connection.Open();
                 command.ExecuteNonQuery();
- 
+
                 using (MySqlCommand cmdId = new MySqlCommand("SELECT LAST_INSERT_ID();", connection))
                 {
                     res = Convert.ToInt32(cmdId.ExecuteScalar());
@@ -37,7 +37,7 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
         }
         return res;
     }
- 
+
     public int Anular(int id, int idUsuarioAnulador)
     {
         int res = -1;
@@ -45,39 +45,39 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
         {
             string sql = @"UPDATE pago SET estado = FALSE, id_usuario_anulador = @idUsuarioAnulador 
                 WHERE id_pago = @id;";
- 
+
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@idUsuarioAnulador", idUsuarioAnulador);
                 command.Parameters.AddWithValue("@id", id);
- 
+
                 connection.Open();
                 res = command.ExecuteNonQuery();
             }
         }
         return res;
     }
- 
+
     public int ModificarConcepto(int id, string concepto)
     {
         int res = -1;
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             string sql = @"UPDATE pago SET concepto = @concepto WHERE id_pago = @id;";
- 
+
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@concepto", concepto);
                 command.Parameters.AddWithValue("@id", id);
- 
+
                 connection.Open();
                 res = command.ExecuteNonQuery();
             }
         }
         return res;
     }
- 
-    public List<Pago> ListarPorReserva(int idReserva)
+
+    public List<Pago> ListarPorReserva(int idReserva, int paginaNro = 1, int tamPagina = 10)
     {
         List<Pago> lista = new List<Pago>();
         using (MySqlConnection connection = new MySqlConnection(connectionString))
@@ -90,12 +90,18 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
                 LEFT JOIN usuario uc ON p.id_usuario_creador = uc.id_usuario
                 LEFT JOIN usuario ua ON p.id_usuario_anulador = ua.id_usuario
                 WHERE p.id_reserva = @idReserva
-                ORDER BY p.fecha_pago;";
- 
+                ORDER BY p.fecha_pago
+                LIMIT @tamPagina OFFSET @offset";
+
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
+
+                int offset = (paginaNro - 1) * tamPagina;
+
+                command.Parameters.AddWithValue("@tamPagina", tamPagina);
+                command.Parameters.AddWithValue("@offset", offset);
                 command.Parameters.AddWithValue("@idReserva", idReserva);
- 
+
                 connection.Open();
                 using (MySqlDataReader reader = command.ExecuteReader())
                 {
@@ -108,7 +114,7 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
         }
         return lista;
     }
- 
+
     public Pago? ObtenerPorId(int id)
     {
         Pago? p = null;
@@ -122,11 +128,11 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
                 LEFT JOIN usuario uc ON p.id_usuario_creador = uc.id_usuario
                 LEFT JOIN usuario ua ON p.id_usuario_anulador = ua.id_usuario
                 WHERE p.id_pago = @id;";
- 
+
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@id", id);
- 
+
                 connection.Open();
                 using (MySqlDataReader reader = command.ExecuteReader())
                 {
@@ -139,7 +145,7 @@ public class RepositorioPago : RepositorioBase, IRepositorioPago
         }
         return p;
     }
- 
+
     private Pago MapearPago(MySqlDataReader reader)
     {
         return new Pago

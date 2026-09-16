@@ -44,3 +44,28 @@
 </table>
 
 <a asp-controller="Reserva" asp-action="Details" asp-route-id="@ViewBag.IdReserva" class= "btn btn-primary">Volver a la reserva</a>
+
+
+<div class="d-flex justify-content-center align-items-center gap-3 mt-4">
+
+    @if (ViewBag.PaginaNro > 1)
+    {
+        <a asp-action="Index" asp-route-paginaNro="@(ViewBag.PaginaNro - 1)" asp-route-tamPagina="@ViewBag.TamPagina"
+            class="btn btn-outline-primary">
+            Anterior
+        </a>
+    }
+
+    <span>
+        Página @ViewBag.PaginaNro
+    </span>
+
+    @if (Model.Count() == ViewBag.TamPagina)
+    {
+        <a asp-action="Index" asp-route-paginaNro="@(ViewBag.PaginaNro + 1)" asp-route-tamPagina="@ViewBag.TamPagina"
+            class="btn btn-outline-primary">
+            Siguiente
+        </a>
+    }
+
+</div>

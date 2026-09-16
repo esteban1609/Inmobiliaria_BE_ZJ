@@ -17,10 +17,12 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         private int IdUsuarioActual => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        public IActionResult Index(int idReserva)
+        public IActionResult Index(int idReserva,int paginaNro = 1, int tamPagina = 10)
         {
             ViewBag.IdReserva = idReserva;
-            return View(repositorio.ListarPorReserva(idReserva));
+            ViewBag.PaginaNro = paginaNro;
+            ViewBag.TamPagina = tamPagina;
+            return View(repositorio.ListarPorReserva(idReserva, paginaNro,tamPagina));
         }
 
         public IActionResult Create(int idReserva)
