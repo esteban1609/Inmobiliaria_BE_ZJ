@@ -139,14 +139,19 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
         return res;
     }
 
-    public List<Usuario> Listar()
+    public List<Usuario> Listar(int paginaNro = 1, int tamPagina = 10)
     {
         List<Usuario> lista = new List<Usuario>();
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string sql = @"SELECT id_usuario, nombre, apellido, email, clave, rol, avatar, estado FROM usuario;";
+            string sql = @"SELECT id_usuario, nombre, apellido, email, clave, rol, avatar, estado FROM usuario ORDER BY id_usuario LIMIT @tamPagina OFFSET @offset ";
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
+
+                int offset = (paginaNro - 1) * tamPagina;
+
+                command.Parameters.AddWithValue("@tamPagina", tamPagina);
+                command.Parameters.AddWithValue("@offset", offset);
                 connection.Open();
                 using (MySqlDataReader reader = command.ExecuteReader())
                 {

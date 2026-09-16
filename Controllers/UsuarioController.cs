@@ -23,9 +23,12 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
         // ===================== GESTIÓN DE OTROS USUARIOS (SOLO ADMINISTRADOR) =====================
 
         [Authorize(Roles = "Administrador")]
-        public IActionResult Index()
+        public IActionResult Index(int paginaNro = 1, int tamPagina = 10)
         {
-            return View(repositorio.Listar());
+            var lista = repositorio.Listar(paginaNro, tamPagina);
+            ViewBag.PaginaNro = paginaNro;
+            ViewBag.TamPagina = tamPagina;
+            return View(lista);
         }
 
         [Authorize(Roles = "Administrador")]
