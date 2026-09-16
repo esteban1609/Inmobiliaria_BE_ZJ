@@ -16,9 +16,11 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
         }
 
         // GET: Propietario
-        public IActionResult Index()
+        public IActionResult Index(int paginaNro = 1, int tamPagina = 10)
         {
-            var lista = repositorio.Listar();
+            var lista = repositorio.Listar(paginaNro, tamPagina);
+            ViewBag.PaginaNro = paginaNro;
+            ViewBag.TamPagina = tamPagina;
             return View(lista);
         }
 
