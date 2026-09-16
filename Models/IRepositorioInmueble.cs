@@ -2,7 +2,7 @@ namespace Inmobiliaria_BarrosoEsteban.Models
 {
     public interface IRepositorioInmueble
     {
-        IList<Inmueble> Listar();
+        IList<Inmueble> Listar(int paginaNro = 1,int tamPagina = 10);
         IList<Inmueble> ListarPorEstado(bool estado);
 
         IList<Inmueble> ListarPorPropietario(int idPropietario);

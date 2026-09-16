@@ -197,7 +197,7 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
     }
 
 
-    public IList<Inmueble> Listar()
+    public IList<Inmueble> Listar(int paginaNro = 1, int tamPagina = 10)
     {
         var lista = new List<Inmueble>();
 
@@ -228,9 +228,15 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
                 INNER JOIN TipoInmueble t
                     ON i.id_tipo = t.id_tipo
 
-                ORDER BY i.id_inmueble";
+                ORDER BY i.id_inmueble
+                LIMIT @tamPagina OFFSET @offset";
 
         using var command = new MySqlCommand(sql, connection);
+
+        int offset = (paginaNro - 1) * tamPagina;
+
+        command.Parameters.AddWithValue("@tamPagina", tamPagina);
+        command.Parameters.AddWithValue("@offset", offset);
         connection.Open();
         using var reader = command.ExecuteReader();
         while (reader.Read())
@@ -389,13 +395,13 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
 
 
     public IList<Inmueble> ListarPorPropietario(int idPropietario)
-{
-    var lista = new List<Inmueble>();
+    {
+        var lista = new List<Inmueble>();
 
-    using var connection =
-        new MySqlConnection(connectionString);
+        using var connection =
+            new MySqlConnection(connectionString);
 
-    string sql = @"
+        string sql = @"
         SELECT
             i.id_inmueble,
             i.direccion,
@@ -423,85 +429,85 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
 
         ORDER BY i.id_inmueble;";
 
-    using var command =
-        new MySqlCommand(sql, connection);
+        using var command =
+            new MySqlCommand(sql, connection);
 
-    command.Parameters.AddWithValue(
-        "@idPropietario",
-        idPropietario
-    );
+        command.Parameters.AddWithValue(
+            "@idPropietario",
+            idPropietario
+        );
 
-    connection.Open();
+        connection.Open();
 
-    using var reader = command.ExecuteReader();
+        using var reader = command.ExecuteReader();
 
-    while (reader.Read())
-    {
-        var inmueble = new Inmueble
+        while (reader.Read())
         {
-            IdInmueble =
-                reader.GetInt32("id_inmueble"),
-
-            Direccion =
-                reader.GetString("direccion"),
-
-            Cupo =
-                reader.GetInt32("cupo"),
-
-            PrecioPorDia =
-                reader.GetDecimal("precio_por_dia"),
-
-            PorcentajeReserva =
-                reader.GetDecimal("porcentaje_reserva"),
-
-            Latitud =
-                reader.GetDecimal("latitud"),
-
-            Longitud =
-                reader.GetDecimal("longitud"),
-
-            IdPropietario =
-                reader.GetInt32("id_propietario"),
-
-            Estado =
-                reader.GetBoolean("estado"),
-
-            id_tipo =
-                reader.GetInt32("id_tipo"),
-
-            Portada =
-                reader.IsDBNull(
-                    reader.GetOrdinal("portada"))
-                ? null
-                : reader.GetString("portada"),
-
-            Propietario = new Propietario
+            var inmueble = new Inmueble
             {
+                IdInmueble =
+                    reader.GetInt32("id_inmueble"),
+
+                Direccion =
+                    reader.GetString("direccion"),
+
+                Cupo =
+                    reader.GetInt32("cupo"),
+
+                PrecioPorDia =
+                    reader.GetDecimal("precio_por_dia"),
+
+                PorcentajeReserva =
+                    reader.GetDecimal("porcentaje_reserva"),
+
+                Latitud =
+                    reader.GetDecimal("latitud"),
+
+                Longitud =
+                    reader.GetDecimal("longitud"),
+
                 IdPropietario =
                     reader.GetInt32("id_propietario"),
 
-                Nombre =
-                    reader.GetString("propietario_nombre"),
+                Estado =
+                    reader.GetBoolean("estado"),
 
-                Apellido =
-                    reader.GetString("propietario_apellido")
-            },
-
-            TipoInmueble = new TipoInmueble
-            {
                 id_tipo =
                     reader.GetInt32("id_tipo"),
 
-                Nombre =
-                    reader.GetString("tipo_nombre")
-            }
-        };
+                Portada =
+                    reader.IsDBNull(
+                        reader.GetOrdinal("portada"))
+                    ? null
+                    : reader.GetString("portada"),
 
-        lista.Add(inmueble);
+                Propietario = new Propietario
+                {
+                    IdPropietario =
+                        reader.GetInt32("id_propietario"),
+
+                    Nombre =
+                        reader.GetString("propietario_nombre"),
+
+                    Apellido =
+                        reader.GetString("propietario_apellido")
+                },
+
+                TipoInmueble = new TipoInmueble
+                {
+                    id_tipo =
+                        reader.GetInt32("id_tipo"),
+
+                    Nombre =
+                        reader.GetString("tipo_nombre")
+                }
+            };
+
+            lista.Add(inmueble);
+        }
+
+        return lista;
     }
-
-    return lista;
-}
 
     public int ModificarPortada(int id, string url)
     {
@@ -540,11 +546,11 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
                 AND direccion LIKE @term
                 ORDER BY direccion
                 LIMIT 20;";
-    
+
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@term", $"%{term}%");
-    
+
                 connection.Open();
                 using (MySqlDataReader reader = command.ExecuteReader())
                 {

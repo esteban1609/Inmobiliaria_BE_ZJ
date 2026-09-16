@@ -24,7 +24,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
         }
 
         // LISTADO
-        public IActionResult Index(bool? estado, int? idPropietario)
+        public IActionResult Index(bool? estado, int? idPropietario ,int paginaNro = 1,int tamPagina = 10)
         {
             IList<Inmueble> lista;
 
@@ -50,7 +50,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             }
             else
             {
-                lista = repositorio.Listar();
+                lista = repositorio.Listar(paginaNro,tamPagina);
             }
 
             // Lista de propietarios para el select
@@ -59,6 +59,9 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             // Mantener los filtros seleccionados
             ViewBag.EstadoSeleccionado = estado;
             ViewBag.PropietarioSeleccionado = idPropietario;
+
+            ViewBag.PaginaNro = paginaNro;
+            ViewBag.TamPagina = tamPagina;
 
             return View(lista);
         }
