@@ -33,6 +33,83 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             ViewBag.Inmuebles = repositorioInmueble.Listar();
         }
 
+
+        //Inmuebles mas reservados en los ultimos 365 dias
+        public IActionResult MasReservados()
+        {
+            var lista =
+                repositorio.MasReservadosUltimos365Dias();
+
+            return View(lista);
+        }
+
+        //inmuebles sin reservas
+        public IActionResult SinReservas(int dias = 30)
+        {
+            if (dias <= 0)
+            {
+                dias = 30;
+            }
+
+            var lista =
+                repositorio.SinReservasUltimosDias(dias);
+
+            ViewBag.Dias = dias;
+
+            return View(lista);
+        }
+
+
+        //Reservas Vigentes
+        public IActionResult Vigentes()
+        {
+            var lista =
+                repositorio.ListarVigentes();
+
+            return View(lista);
+        }
+
+        //Reservas que estan por finalizar
+        public IActionResult ProximasAFinalizar(int dias = 30)
+        {
+            if (dias <= 0)
+            {
+                dias = 30;
+            }
+
+            var lista =repositorio.ListarQueTerminanEnDias(dias);
+
+            ViewBag.Dias = dias;
+
+            return View(lista);
+        }
+
+        //Reservas disponibles
+        public IActionResult Disponibles(DateTime? fechaDesde,DateTime? fechaHasta)
+        {
+            IList<Inmueble> lista =
+                new List<Inmueble>();
+
+            if (fechaDesde.HasValue &&
+                fechaHasta.HasValue)
+            {
+                if (fechaHasta.Value < fechaDesde.Value)
+                {
+                    ViewBag.Error ="La fecha hasta no puede ser anterior a la fecha desde.";
+                }
+                else
+                {
+                    lista =
+                        repositorio.ListarInmueblesDisponibles(fechaDesde.Value,fechaHasta.Value);
+                }
+            }
+
+            ViewBag.FechaDesde = fechaDesde;
+            ViewBag.FechaHasta = fechaHasta;
+
+            return View(lista);
+        }
+
         public IActionResult Index(int paginaNro = 1, int tamPagina = 10)
         {
 
@@ -78,6 +155,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             CargarListas();
             return View(r);
         }
+        
 
         [HttpPost]
         public IActionResult Edit(int id, Reserva r)
