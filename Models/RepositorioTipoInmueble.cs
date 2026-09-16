@@ -4,161 +4,169 @@ using MySqlConnector;
 
 namespace Inmobiliaria_BarrosoEsteban;
 
-    public class RepositorioTipoInmueble : RepositorioBase, IRepositorioTipoInmueble
+public class RepositorioTipoInmueble : RepositorioBase, IRepositorioTipoInmueble
+{
+    public RepositorioTipoInmueble(IConfiguration configuration) : base(configuration)
     {
-        public RepositorioTipoInmueble(IConfiguration configuration) : base(configuration)
-        {
-        }
+    }
 
-        public int Alta(TipoInmueble t)
+    public int Alta(TipoInmueble t)
+    {
+        int res = -1;
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            int res = -1;
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                string sql = @"INSERT INTO TipoInmueble 
+            string sql = @"INSERT INTO TipoInmueble 
                 (Nombre,Estado)
                 VALUES (@Nombre,@Estado);
                 SELECT LAST_INSERT_ID();";
 
-                using (MySqlCommand command = new MySqlCommand(sql, connection))
-                {
-                    command.Parameters.AddWithValue("@Nombre", t.Nombre);
-                    command.Parameters.AddWithValue("@Estado", t.Estado);
-                    connection.Open();
-                    res = Convert.ToInt32(command.ExecuteScalar());
-                    t.id_tipo = res;
-                }
-            }
-            return res;
-        }
-
-        // Baja lógica
-        public int Baja(int id)
-        {
-            int res = -1;
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
-                string sql = @"UPDATE TipoInmueble SET Estado = FALSE WHERE id_tipo = @id;";
 
-                using (MySqlCommand command = new MySqlCommand(sql, connection))
-                {
-                    command.Parameters.AddWithValue("@id", id);
 
-                    connection.Open();
-                    res = command.ExecuteNonQuery();
-                }
+                command.Parameters.AddWithValue("@Nombre", t.Nombre);
+                command.Parameters.AddWithValue("@Estado", t.Estado);
+                connection.Open();
+                res = Convert.ToInt32(command.ExecuteScalar());
+                t.id_tipo = res;
             }
-            return res;
         }
+        return res;
+    }
 
-        public int Reactivar(int id)
+    // Baja lógica
+    public int Baja(int id)
+    {
+        int res = -1;
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            int res = -1;
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            string sql = @"UPDATE TipoInmueble SET Estado = FALSE WHERE id_tipo = @id;";
+
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
-                string sql = @"UPDATE TipoInmueble SET Estado = TRUE WHERE id_tipo = @id;";
+                command.Parameters.AddWithValue("@id", id);
 
-                using (MySqlCommand command = new MySqlCommand(sql, connection))
-                {
-                    command.Parameters.AddWithValue("@id", id);
-
-                    connection.Open();
-                    res = command.ExecuteNonQuery();
-                }
+                connection.Open();
+                res = command.ExecuteNonQuery();
             }
-            return res;
         }
+        return res;
+    }
 
-        public int Modificacion(TipoInmueble t)
+    public int Reactivar(int id)
+    {
+        int res = -1;
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            int res = -1;
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            string sql = @"UPDATE TipoInmueble SET Estado = TRUE WHERE id_tipo = @id;";
+
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
-                string sql = @"UPDATE TipoInmueble SET
+                command.Parameters.AddWithValue("@id", id);
+
+                connection.Open();
+                res = command.ExecuteNonQuery();
+            }
+        }
+        return res;
+    }
+
+    public int Modificacion(TipoInmueble t)
+    {
+        int res = -1;
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            string sql = @"UPDATE TipoInmueble SET
                 Nombre = @Nombre
                 WHERE id_tipo = @id;";
 
-                using (MySqlCommand command = new MySqlCommand(sql, connection))
-                {
-                    command.Parameters.AddWithValue("@Nombre", t.Nombre);
-                    command.Parameters.AddWithValue("@id", t.id_tipo);
-                    connection.Open();
-                    res = command.ExecuteNonQuery();
-                }
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@Nombre", t.Nombre);
+                command.Parameters.AddWithValue("@id", t.id_tipo);
+                connection.Open();
+                res = command.ExecuteNonQuery();
             }
-            return res;
         }
+        return res;
+    }
 
 
 
-        public IList<TipoInmueble> Listar()
-        {
-            var lista = new List<TipoInmueble>();
+    public IList<TipoInmueble> Listar(int paginaNro = 1, int tamPagina = 10)
+    {
+        var lista = new List<TipoInmueble>();
 
-            using var connection =
-                new MySqlConnection(connectionString);
+        using var connection =
+            new MySqlConnection(connectionString);
 
-            string sql = @"SELECT
+        string sql = @"SELECT
                                 id_tipo,
                                 Nombre,
                                 Estado
                            FROM TipoInmueble
-                           ORDER BY nombre;";
+                           ORDER BY nombre
+                           LIMIT @tamPagina OFFSET @offset";
 
-            using var command =
-                new MySqlCommand(sql, connection);
+        using var command =
+            new MySqlCommand(sql, connection);
 
-            connection.Open();
+        int offset = (paginaNro - 1) * tamPagina;
 
-            using var reader = command.ExecuteReader();
+        command.Parameters.AddWithValue("@tamPagina", tamPagina);
+        command.Parameters.AddWithValue("@offset", offset);
 
-            while (reader.Read())
+        connection.Open();
+
+        using var reader = command.ExecuteReader();
+
+        while (reader.Read())
+        {
+            lista.Add(new TipoInmueble
             {
-                lista.Add(new TipoInmueble
-                {
-                    id_tipo = reader.GetInt32("id_tipo"),
-                    Nombre = reader.GetString("Nombre"),
-                    Estado = reader.GetBoolean("Estado")
-                });
-            }
-
-            return lista;
+                id_tipo = reader.GetInt32("id_tipo"),
+                Nombre = reader.GetString("Nombre"),
+                Estado = reader.GetBoolean("Estado")
+            });
         }
 
-        public TipoInmueble? ObtenerPorId(int id)
-        {
-            TipoInmueble? tipo = null;
+        return lista;
+    }
 
-            using var connection = new MySqlConnection(connectionString);
+    public TipoInmueble? ObtenerPorId(int id)
+    {
+        TipoInmueble? tipo = null;
 
-            string sql = @"SELECT
+        using var connection = new MySqlConnection(connectionString);
+
+        string sql = @"SELECT
                                 id_tipo,
                                 nombre,
                                 estado
                            FROM TipoInmueble
                            WHERE id_tipo = @id;";
 
-            using var command = new MySqlCommand(sql, connection);
+        using var command = new MySqlCommand(sql, connection);
 
-            command.Parameters.AddWithValue("@id", id);
+        command.Parameters.AddWithValue("@id", id);
 
-            connection.Open();
+        connection.Open();
 
-            using var reader = command.ExecuteReader();
+        using var reader = command.ExecuteReader();
 
-            if (reader.Read())
+        if (reader.Read())
+        {
+            tipo = new TipoInmueble
             {
-                tipo = new TipoInmueble
-                {
-                    id_tipo = reader.GetInt32("id_tipo"),
-                    Nombre = reader.GetString("Nombre"),
-                    Estado = reader.GetBoolean("Estado")
-                };
-            }
-
-            return tipo;
+                id_tipo = reader.GetInt32("id_tipo"),
+                Nombre = reader.GetString("Nombre"),
+                Estado = reader.GetBoolean("Estado")
+            };
         }
 
-
+        return tipo;
     }
+
+
+}
 
