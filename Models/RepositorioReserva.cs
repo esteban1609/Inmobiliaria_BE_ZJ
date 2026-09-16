@@ -10,76 +10,76 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
     }
 
     // Alta ahora recibe también quién la crea
-public int Alta(Reserva r, int idUsuarioCreador)
-{
-    int res = -1;
-    using (MySqlConnection connection = new MySqlConnection(connectionString))
+    public int Alta(Reserva r, int idUsuarioCreador)
     {
-        string sql = @"INSERT INTO reserva 
+        int res = -1;
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            string sql = @"INSERT INTO reserva 
             (id_inquilino, id_inmueble, monto_dia, fecha_desde, fecha_hasta, id_usuario_creador)
             VALUES (@idInquilino, @idInmueble, @montoDia, @fechaDesde, @fechaHasta, @idUsuarioCreador);";
- 
-        using (MySqlCommand command = new MySqlCommand(sql, connection))
-        {
-            command.Parameters.AddWithValue("@idInquilino", r.IdInquilino);
-            command.Parameters.AddWithValue("@idInmueble", r.IdInmueble);
-            command.Parameters.AddWithValue("@montoDia", r.MontoDia);
-            command.Parameters.AddWithValue("@fechaDesde", r.FechaDesde);
-            command.Parameters.AddWithValue("@fechaHasta", r.FechaHasta);
-            command.Parameters.AddWithValue("@idUsuarioCreador", idUsuarioCreador);
- 
-            connection.Open();
-            command.ExecuteNonQuery();
- 
-            using (MySqlCommand cmdId = new MySqlCommand("SELECT LAST_INSERT_ID();", connection))
+
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
-                res = Convert.ToInt32(cmdId.ExecuteScalar());
-                r.IdReserva = res;
+                command.Parameters.AddWithValue("@idInquilino", r.IdInquilino);
+                command.Parameters.AddWithValue("@idInmueble", r.IdInmueble);
+                command.Parameters.AddWithValue("@montoDia", r.MontoDia);
+                command.Parameters.AddWithValue("@fechaDesde", r.FechaDesde);
+                command.Parameters.AddWithValue("@fechaHasta", r.FechaHasta);
+                command.Parameters.AddWithValue("@idUsuarioCreador", idUsuarioCreador);
+
+                connection.Open();
+                command.ExecuteNonQuery();
+
+                using (MySqlCommand cmdId = new MySqlCommand("SELECT LAST_INSERT_ID();", connection))
+                {
+                    res = Convert.ToInt32(cmdId.ExecuteScalar());
+                    r.IdReserva = res;
+                }
             }
         }
+        return res;
     }
-    return res;
-}
- 
-// Baja ahora registra quién la terminó
-public int Baja(int id, int idUsuarioTerminador)
-{
-    int res = -1;
-    using (MySqlConnection connection = new MySqlConnection(connectionString))
+
+    // Baja ahora registra quién la terminó
+    public int Baja(int id, int idUsuarioTerminador)
     {
-        string sql = @"UPDATE reserva SET estado = FALSE, id_usuario_terminador = @idUsuarioTerminador 
-            WHERE id_reserva = @id;";
- 
-        using (MySqlCommand command = new MySqlCommand(sql, connection))
+        int res = -1;
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            command.Parameters.AddWithValue("@idUsuarioTerminador", idUsuarioTerminador);
-            command.Parameters.AddWithValue("@id", id);
- 
-            connection.Open();
-            res = command.ExecuteNonQuery();
+            string sql = @"UPDATE reserva SET estado = FALSE, id_usuario_terminador = @idUsuarioTerminador 
+            WHERE id_reserva = @id;";
+
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@idUsuarioTerminador", idUsuarioTerminador);
+                command.Parameters.AddWithValue("@id", id);
+
+                connection.Open();
+                res = command.ExecuteNonQuery();
+            }
         }
+        return res;
     }
-    return res;
-}
 
     public int Reactivar(int id)
-{
-    int res = -1;
-    using (MySqlConnection connection = new MySqlConnection(connectionString))
     {
-        string sql = @"UPDATE reserva SET estado = TRUE, id_usuario_terminador = NULL 
+        int res = -1;
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            string sql = @"UPDATE reserva SET estado = TRUE, id_usuario_terminador = NULL 
             WHERE id_reserva = @id;";
 
-        using (MySqlCommand command = new MySqlCommand(sql, connection))
-        {
-            command.Parameters.AddWithValue("@id", id);
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@id", id);
 
-            connection.Open();
-            res = command.ExecuteNonQuery();
+                connection.Open();
+                res = command.ExecuteNonQuery();
+            }
         }
+        return res;
     }
-    return res;
-}
     public int Modificacion(Reserva r)
     {
         int res = -1;
@@ -110,7 +110,7 @@ public int Baja(int id, int idUsuarioTerminador)
     }
 
     // Trae también nombre del inquilino y dirección del inmueble, para que la vista sea legible
-    public List<Reserva> Listar()
+    public List<Reserva> Listar(int paginaNro = 1, int tamPagina = 10)
     {
         List<Reserva> lista = new List<Reserva>();
         using (MySqlConnection connection = new MySqlConnection(connectionString))
@@ -126,10 +126,19 @@ public int Baja(int id, int idUsuarioTerminador)
                             INNER JOIN inquilino i ON r.id_inquilino = i.id_inquilino
                             INNER JOIN inmueble m ON r.id_inmueble = m.id_inmueble
                             LEFT JOIN usuario uc ON r.id_usuario_creador = uc.id_usuario
-                            LEFT JOIN usuario ut ON r.id_usuario_terminador = ut.id_usuario";
+                            LEFT JOIN usuario ut ON r.id_usuario_terminador = ut.id_usuario
+                            ORDER BY r.id_reserva
+                            LIMIT @tamPagina OFFSET @offset";
+
 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
+
+                int offset = (paginaNro - 1) * tamPagina;
+
+                command.Parameters.AddWithValue("@tamPagina", tamPagina);
+                command.Parameters.AddWithValue("@offset", offset);
+                
                 connection.Open();
                 using (MySqlDataReader reader = command.ExecuteReader())
                 {
@@ -238,14 +247,14 @@ public int Baja(int id, int idUsuarioTerminador)
 
 
 
-public IList<Inmueble> MasReservadosUltimos365Dias()
-{
-    var lista = new List<Inmueble>();
+    public IList<Inmueble> MasReservadosUltimos365Dias()
+    {
+        var lista = new List<Inmueble>();
 
-    using var connection =
-        new MySqlConnection(connectionString);
+        using var connection =
+            new MySqlConnection(connectionString);
 
-    string sql = @"
+        string sql = @"
         SELECT
             i.id_inmueble,
             i.direccion,
@@ -273,55 +282,55 @@ public IList<Inmueble> MasReservadosUltimos365Dias()
 
         ORDER BY cantidad_reservas DESC;";
 
-    using var command =
-        new MySqlCommand(sql, connection);
+        using var command =
+            new MySqlCommand(sql, connection);
 
-    connection.Open();
+        connection.Open();
 
-    using var reader =
-        command.ExecuteReader();
+        using var reader =
+            command.ExecuteReader();
 
-    while (reader.Read())
-    {
-        var inmueble = new Inmueble
+        while (reader.Read())
         {
-            IdInmueble =
-                reader.GetInt32("id_inmueble"),
-
-            Direccion =
-                reader.GetString("direccion"),
-
-            Estado =
-                reader.GetBoolean("estado"),
-
-            CantidadReservas =
-                reader.GetInt32("cantidad_reservas"),
-
-            Propietario = new Propietario
+            var inmueble = new Inmueble
             {
-                Nombre =
-                    reader.GetString("propietario_nombre"),
+                IdInmueble =
+                    reader.GetInt32("id_inmueble"),
 
-                Apellido =
-                    reader.GetString("propietario_apellido")
-            }
-        };
+                Direccion =
+                    reader.GetString("direccion"),
 
-        lista.Add(inmueble);
+                Estado =
+                    reader.GetBoolean("estado"),
+
+                CantidadReservas =
+                    reader.GetInt32("cantidad_reservas"),
+
+                Propietario = new Propietario
+                {
+                    Nombre =
+                        reader.GetString("propietario_nombre"),
+
+                    Apellido =
+                        reader.GetString("propietario_apellido")
+                }
+            };
+
+            lista.Add(inmueble);
+        }
+
+        return lista;
     }
 
-    return lista;
-}
 
+    public IList<Inmueble> SinReservasUltimosDias(int dias)
+    {
+        var lista = new List<Inmueble>();
 
-public IList<Inmueble> SinReservasUltimosDias(int dias)
-{
-    var lista = new List<Inmueble>();
+        using var connection =
+            new MySqlConnection(connectionString);
 
-    using var connection =
-        new MySqlConnection(connectionString);
-
-    string sql = @"
+        string sql = @"
         SELECT
             i.id_inmueble,
             i.direccion,
@@ -351,56 +360,56 @@ public IList<Inmueble> SinReservasUltimosDias(int dias)
 
         ORDER BY i.direccion;";
 
-    using var command =
-        new MySqlCommand(sql, connection);
+        using var command =
+            new MySqlCommand(sql, connection);
 
-    command.Parameters.AddWithValue(
-        "@dias",
-        dias
-    );
+        command.Parameters.AddWithValue(
+            "@dias",
+            dias
+        );
 
-    connection.Open();
+        connection.Open();
 
-    using var reader =
-        command.ExecuteReader();
+        using var reader =
+            command.ExecuteReader();
 
-    while (reader.Read())
-    {
-        var inmueble = new Inmueble
+        while (reader.Read())
         {
-            IdInmueble =
-                reader.GetInt32("id_inmueble"),
-
-            Direccion =
-                reader.GetString("direccion"),
-
-            Estado =
-                reader.GetBoolean("estado"),
-
-            Propietario = new Propietario
+            var inmueble = new Inmueble
             {
-                Nombre =
-                    reader.GetString(
-                        "propietario_nombre"),
+                IdInmueble =
+                    reader.GetInt32("id_inmueble"),
 
-                Apellido =
-                    reader.GetString(
-                        "propietario_apellido")
-            },
+                Direccion =
+                    reader.GetString("direccion"),
 
-            TipoInmueble = new TipoInmueble
-            {
-                Nombre =
-                    reader.GetString(
-                        "tipo_nombre")
-            }
-        };
+                Estado =
+                    reader.GetBoolean("estado"),
 
-        lista.Add(inmueble);
+                Propietario = new Propietario
+                {
+                    Nombre =
+                        reader.GetString(
+                            "propietario_nombre"),
+
+                    Apellido =
+                        reader.GetString(
+                            "propietario_apellido")
+                },
+
+                TipoInmueble = new TipoInmueble
+                {
+                    Nombre =
+                        reader.GetString(
+                            "tipo_nombre")
+                }
+            };
+
+            lista.Add(inmueble);
+        }
+
+        return lista;
     }
-
-    return lista;
-}
 
     public IList<Reserva> ListarQueTerminanEnDias(int dias)
     {
@@ -554,13 +563,13 @@ public IList<Inmueble> SinReservasUltimosDias(int dias)
         using var command =
             new MySqlCommand(sql, connection);
 
-        command.Parameters.AddWithValue("@fechaDesde",fechaDesde);
+        command.Parameters.AddWithValue("@fechaDesde", fechaDesde);
 
-        command.Parameters.AddWithValue("@fechaHasta",fechaHasta);
+        command.Parameters.AddWithValue("@fechaHasta", fechaHasta);
 
         connection.Open();
 
-        using var reader =command.ExecuteReader();
+        using var reader = command.ExecuteReader();
 
         while (reader.Read())
         {
@@ -653,22 +662,22 @@ public IList<Inmueble> SinReservasUltimosDias(int dias)
 
     // Método privado para no repetir el mapeo en Listar y ObtenerPorId
     private Reserva MapearReserva(MySqlDataReader reader)
-{
-    return new Reserva
     {
-        IdReserva = reader.GetInt32(reader.GetOrdinal("id_reserva")),
-        IdInquilino = reader.GetInt32(reader.GetOrdinal("id_inquilino")),
-        IdInmueble = reader.GetInt32(reader.GetOrdinal("id_inmueble")),
-        MontoDia = reader.GetDecimal(reader.GetOrdinal("monto_dia")),
-        FechaDesde = reader.GetDateTime(reader.GetOrdinal("fecha_desde")),
-        FechaHasta = reader.GetDateTime(reader.GetOrdinal("fecha_hasta")),
-        Estado = reader.GetBoolean(reader.GetOrdinal("estado")),
-        NombreInquilino = reader.GetString(reader.GetOrdinal("nombre_inquilino")),
-        DireccionInmueble = reader.GetString(reader.GetOrdinal("direccion_inmueble")),
-        IdUsuarioCreador = reader.IsDBNull(reader.GetOrdinal("id_usuario_creador")) ? null : reader.GetInt32(reader.GetOrdinal("id_usuario_creador")),
-        IdUsuarioTerminador = reader.IsDBNull(reader.GetOrdinal("id_usuario_terminador")) ? null : reader.GetInt32(reader.GetOrdinal("id_usuario_terminador")),
-        NombreUsuarioCreador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_creador")) ? null : reader.GetString(reader.GetOrdinal("nombre_usuario_creador")),
-        NombreUsuarioTerminador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_terminador")) ? null : reader.GetString(reader.GetOrdinal("nombre_usuario_terminador"))
-    };
-}
+        return new Reserva
+        {
+            IdReserva = reader.GetInt32(reader.GetOrdinal("id_reserva")),
+            IdInquilino = reader.GetInt32(reader.GetOrdinal("id_inquilino")),
+            IdInmueble = reader.GetInt32(reader.GetOrdinal("id_inmueble")),
+            MontoDia = reader.GetDecimal(reader.GetOrdinal("monto_dia")),
+            FechaDesde = reader.GetDateTime(reader.GetOrdinal("fecha_desde")),
+            FechaHasta = reader.GetDateTime(reader.GetOrdinal("fecha_hasta")),
+            Estado = reader.GetBoolean(reader.GetOrdinal("estado")),
+            NombreInquilino = reader.GetString(reader.GetOrdinal("nombre_inquilino")),
+            DireccionInmueble = reader.GetString(reader.GetOrdinal("direccion_inmueble")),
+            IdUsuarioCreador = reader.IsDBNull(reader.GetOrdinal("id_usuario_creador")) ? null : reader.GetInt32(reader.GetOrdinal("id_usuario_creador")),
+            IdUsuarioTerminador = reader.IsDBNull(reader.GetOrdinal("id_usuario_terminador")) ? null : reader.GetInt32(reader.GetOrdinal("id_usuario_terminador")),
+            NombreUsuarioCreador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_creador")) ? null : reader.GetString(reader.GetOrdinal("nombre_usuario_creador")),
+            NombreUsuarioTerminador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_terminador")) ? null : reader.GetString(reader.GetOrdinal("nombre_usuario_terminador"))
+        };
+    }
 }

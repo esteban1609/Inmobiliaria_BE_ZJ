@@ -33,9 +33,13 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             ViewBag.Inmuebles = repositorioInmueble.Listar();
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int paginaNro = 1, int tamPagina = 10)
         {
-            return View(repositorio.Listar());
+
+            var lista = repositorio.Listar(paginaNro, tamPagina);
+            ViewBag.PaginaNro = paginaNro;
+            ViewBag.TamPagina = tamPagina;
+            return View(lista);
         }
 
         public IActionResult Details(int id)
@@ -105,4 +109,4 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             return RedirectToAction(nameof(Index));
         }
     }
-} 
+}
