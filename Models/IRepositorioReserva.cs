@@ -19,6 +19,7 @@ namespace Inmobiliaria_BarrosoEsteban
 
 
         Reserva? ObtenerPorId(int id);
+        bool ExisteSolapamiento(int idInmueble, DateTime fechaDesde, DateTime fechaHasta, int? idReservaExcluir = null);
         
     }
 }

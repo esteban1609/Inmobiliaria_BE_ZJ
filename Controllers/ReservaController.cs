@@ -142,7 +142,21 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
                 CargarListas();
                 return View(r);
             }
-
+        
+            if (r.FechaHasta < r.FechaDesde)
+            {
+                ModelState.AddModelError(nameof(r.FechaHasta), "La fecha hasta no puede ser anterior a la fecha desde.");
+                CargarListas();
+                return View(r);
+            }
+        
+            if (repositorio.ExisteSolapamiento(r.IdInmueble, r.FechaDesde, r.FechaHasta))
+            {
+                ModelState.AddModelError(string.Empty, "El inmueble seleccionado ya está reservado en esas fechas.");
+                CargarListas();
+                return View(r);
+            }
+        
             repositorio.Alta(r, IdUsuarioActual);
             return RedirectToAction(nameof(Index));
         }
@@ -165,7 +179,22 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
                 CargarListas();
                 return View(r);
             }
-
+        
+            if (r.FechaHasta < r.FechaDesde)
+            {
+                ModelState.AddModelError(nameof(r.FechaHasta), "La fecha hasta no puede ser anterior a la fecha desde.");
+                CargarListas();
+                return View(r);
+            }
+        
+            // idReservaExcluir: no choca contra sí misma al validar
+            if (repositorio.ExisteSolapamiento(r.IdInmueble, r.FechaDesde, r.FechaHasta, id))
+            {
+                ModelState.AddModelError(string.Empty, "El inmueble seleccionado ya está reservado en esas fechas.");
+                CargarListas();
+                return View(r);
+            }
+        
             r.IdReserva = id;
             repositorio.Modificacion(r);
             return RedirectToAction(nameof(Index));

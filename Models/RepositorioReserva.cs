@@ -689,4 +689,35 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
             NombreUsuarioTerminador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_terminador")) ? null : reader.GetString(reader.GetOrdinal("nombre_usuario_terminador"))
         };
     }
+
+    public bool ExisteSolapamiento(int idInmueble, DateTime fechaDesde, DateTime fechaHasta, int? idReservaExcluir = null)
+    {
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            string filtroExcluir = idReservaExcluir.HasValue ? "AND id_reserva <> @idReservaExcluir" : "";
+    
+            string sql = $@"SELECT COUNT(*) FROM reserva
+                WHERE id_inmueble = @idInmueble
+                AND estado = TRUE
+                AND fecha_desde <= @fechaHasta
+                AND fecha_hasta >= @fechaDesde
+                {filtroExcluir};";
+    
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@idInmueble", idInmueble);
+                command.Parameters.AddWithValue("@fechaDesde", fechaDesde);
+                command.Parameters.AddWithValue("@fechaHasta", fechaHasta);
+    
+                if (idReservaExcluir.HasValue)
+                {
+                    command.Parameters.AddWithValue("@idReservaExcluir", idReservaExcluir.Value);
+                }
+    
+                connection.Open();
+                long cantidad = Convert.ToInt64(command.ExecuteScalar());
+                return cantidad > 0;
+            }
+        }
+    }
 }
