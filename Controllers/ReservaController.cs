@@ -135,31 +135,54 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Reserva r)
+public IActionResult Create(Reserva r)
+{
+    if (!ModelState.IsValid)
+    {
+        CargarListas();
+        return View(r);
+    }
+ 
+    if (r.FechaHasta < r.FechaDesde)
+    {
+        ModelState.AddModelError(nameof(r.FechaHasta), "La fecha hasta no puede ser anterior a la fecha desde.");
+        CargarListas();
+        return View(r);
+    }
+ 
+    if (repositorio.ExisteSolapamiento(r.IdInmueble, r.FechaDesde, r.FechaHasta))
+    {
+        ModelState.AddModelError(string.Empty, "El inmueble seleccionado ya está reservado en esas fechas.");
+        CargarListas();
+        return View(r);
+    }
+ 
+    repositorio.Alta(r, IdUsuarioActual);
+ 
+    // ---- Generación automática de la seña, según el % que tiene cargado el inmueble ----
+    var inmueble = repositorioInmueble.ObtenerPorId(r.IdInmueble);
+    if (inmueble != null && inmueble.PorcentajeReserva > 0)
+    {
+        int cantidadDias = (r.FechaHasta - r.FechaDesde).Days;
+        if (cantidadDias <= 0) cantidadDias = 1; // por si la reserva es de un solo día
+ 
+        decimal montoTotal = r.MontoDia * cantidadDias;
+        decimal montoSena = montoTotal * (inmueble.PorcentajeReserva / 100m);
+ 
+        var sena = new Pago
         {
-            if (!ModelState.IsValid)
-            {
-                CargarListas();
-                return View(r);
-            }
-        
-            if (r.FechaHasta < r.FechaDesde)
-            {
-                ModelState.AddModelError(nameof(r.FechaHasta), "La fecha hasta no puede ser anterior a la fecha desde.");
-                CargarListas();
-                return View(r);
-            }
-        
-            if (repositorio.ExisteSolapamiento(r.IdInmueble, r.FechaDesde, r.FechaHasta))
-            {
-                ModelState.AddModelError(string.Empty, "El inmueble seleccionado ya está reservado en esas fechas.");
-                CargarListas();
-                return View(r);
-            }
-        
-            repositorio.Alta(r, IdUsuarioActual);
-            return RedirectToAction(nameof(Index));
-        }
+            IdReserva = r.IdReserva,
+            Concepto = "Seña inicial",
+            FechaPago = DateTime.Today,
+            Importe = montoSena
+        };
+ 
+        repositorioPago.Alta(sena, IdUsuarioActual);
+    }
+    // ------------------------------------------------------------------------------------
+ 
+    return RedirectToAction(nameof(Index));
+}
 
         public IActionResult Edit(int id)
         {
