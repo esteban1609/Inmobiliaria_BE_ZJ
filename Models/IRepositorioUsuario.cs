@@ -10,7 +10,8 @@ namespace Inmobiliaria_BarrosoEsteban
         int Modificacion(Usuario u);         // usado por Administrador para editar a cualquier usuario
         int ModificarPerfilPropio(Usuario u); // usado por Empleado: solo sus propios datos, sin tocar Rol
         int ActualizarClave(int id, string nuevoHash);
-        List<Usuario> Listar(int paginaNro = 1, int tamPagina = 10);
+        List<Usuario> Listar(int paginaNro = 1, int tamPagina = 10, string? busqueda = null);
+
         Usuario? ObtenerPorId(int id);
         Usuario? ObtenerPorEmail(string email); // clave para el login
     }

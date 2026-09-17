@@ -2,7 +2,16 @@
 
 <h1>Usuarios</h1>
 
-<p><a asp-action="Create" class="btn btn-primary">Nuevo Usuario</a></p>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a asp-action="Create" class="btn btn-primary">Nuevo Usuario</a>
+
+    <form asp-action="Index" method="get" class="d-flex" style="width: 300px;">
+        <input type="hidden" name="tamPagina" value="@ViewBag.TamPagina" />
+        <input type="text" name="busqueda" value="@ViewBag.Busqueda"
+               class="form-control me-2" placeholder="Buscar por nombre, apellido o email..." />
+        <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+    </form>
+</div>
 
 <table class="table">
     <thead>
@@ -56,12 +65,12 @@
     </tbody>
 </table>
 
-
 <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
 
     @if (ViewBag.PaginaNro > 1)
     {
         <a asp-action="Index" asp-route-paginaNro="@(ViewBag.PaginaNro - 1)" asp-route-tamPagina="@ViewBag.TamPagina"
+            asp-route-busqueda="@ViewBag.Busqueda"
             class="btn btn-outline-primary">
             Anterior
         </a>
@@ -74,6 +83,7 @@
     @if (Model.Count() == ViewBag.TamPagina)
     {
         <a asp-action="Index" asp-route-paginaNro="@(ViewBag.PaginaNro + 1)" asp-route-tamPagina="@ViewBag.TamPagina"
+            asp-route-busqueda="@ViewBag.Busqueda"
             class="btn btn-outline-primary">
             Siguiente
         </a>

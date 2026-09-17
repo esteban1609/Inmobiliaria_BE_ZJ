@@ -139,19 +139,33 @@ public class RepositorioUsuario : RepositorioBase, IRepositorioUsuario
         return res;
     }
 
-    public List<Usuario> Listar(int paginaNro = 1, int tamPagina = 10)
+    public List<Usuario> Listar(int paginaNro = 1, int tamPagina = 10, string? busqueda = null)
     {
         List<Usuario> lista = new List<Usuario>();
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string sql = @"SELECT id_usuario, nombre, apellido, email, clave, rol, avatar, estado FROM usuario ORDER BY id_usuario LIMIT @tamPagina OFFSET @offset ";
+            string filtro = string.IsNullOrWhiteSpace(busqueda)
+                ? ""
+                : "WHERE nombre LIKE @busqueda OR apellido LIKE @busqueda OR email LIKE @busqueda";
+    
+            string sql = $@"SELECT id_usuario, nombre, apellido, email, clave, rol, avatar, estado 
+                FROM usuario
+                {filtro}
+                ORDER BY id_usuario 
+                LIMIT @tamPagina OFFSET @offset";
+    
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
-
                 int offset = (paginaNro - 1) * tamPagina;
-
+    
                 command.Parameters.AddWithValue("@tamPagina", tamPagina);
                 command.Parameters.AddWithValue("@offset", offset);
+    
+                if (!string.IsNullOrWhiteSpace(busqueda))
+                {
+                    command.Parameters.AddWithValue("@busqueda", $"%{busqueda}%");
+                }
+    
                 connection.Open();
                 using (MySqlDataReader reader = command.ExecuteReader())
                 {
