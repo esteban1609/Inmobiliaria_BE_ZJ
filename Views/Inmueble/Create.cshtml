@@ -24,23 +24,9 @@
                                 Tipo de Inmueble
                             </label>
 
-                            <select asp-for="id_tipo" class="form-select">
+                            <select id="id_tipo" name="id_tipo" class="form-select"></select>
 
-                                <option value="">
-                                    -- Seleccione un tipo --
-                                </option>
-
-                                @foreach (var tipo in ViewBag.TiposInmueble)
-                                {
-                                    <option value="@tipo.id_tipo">
-                                        @tipo.Nombre
-                                    </option>
-                                }
-
-                            </select>
-
-                            <span asp-validation-for="TipoInmueble" class="text-danger">
-                            </span>
+                            <span asp-validation-for="TipoInmueble" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
@@ -78,12 +64,10 @@
                             <label asp-for="Latitud" class="form-label">
                                 Latitud
                             </label>
-                            
+
                             <input asp-for="Latitud" class="form-control" placeholder="Ej: -33,2980000" />
 
-                            
                             <span asp-validation-for="Latitud" class="text-danger"></span>
-                            </span>
                         </div>
 
                         <div class="mb-3">
@@ -94,7 +78,6 @@
                             <input asp-for="Longitud" class="form-control" placeholder="Ej: -66,3400000" />
 
                             <span asp-validation-for="Longitud" class="text-danger"></span>
-                            </span>
                         </div>
 
                         <div class="mb-3">
@@ -103,22 +86,9 @@
                                 Propietario
                             </label>
 
-                            <select asp-for="IdPropietario" class="form-select">
+                            <select id="IdPropietario" name="IdPropietario" class="form-select"></select>
 
-                                <option value="">
-                                    -- Seleccione propietario --
-                                </option>
-
-                                @foreach (var propietario in ViewBag.Propietarios)
-                                {
-                                    <option value="@propietario.IdPropietario">
-                                        @propietario.Nombre @propietario.Apellido
-                                    </option>
-                                }
-
-                            </select>
-
-                            <div class="d-flex justify-content-end gap-2">
+                            <div class="d-flex justify-content-end gap-2 mt-3">
 
                                 <a asp-action="Index" class="btn btn-outline-secondary">
                                     Volver
@@ -132,3 +102,41 @@
                         </div>
 
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(function () {
+            $('#id_tipo').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Buscar tipo de inmueble...',
+                minimumInputLength: 0,
+                ajax: {
+                    url: '/TipoInmueble/BuscarJson',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) { return { term: params.term || '' }; },
+                    processResults: function (data) { return data; }
+                }
+            });
+
+            $('#IdPropietario').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Buscar propietario por nombre, apellido o DNI...',
+                minimumInputLength: 1,
+                ajax: {
+                    url: '/Propietario/BuscarJson',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) { return { term: params.term }; },
+                    processResults: function (data) { return data; }
+                }
+            });
+        });
+    </script>
+}

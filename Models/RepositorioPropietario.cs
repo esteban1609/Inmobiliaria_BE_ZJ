@@ -196,4 +196,40 @@ public class RepositorioPropietario : RepositorioBase, IRepositorioPropietario
         }
         return res;
     }
+
+    public List<Propietario> Buscar(string term)
+    {
+        List<Propietario> lista = new List<Propietario>();
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            string sql = @"SELECT id_propietario, nombre, apellido, dni, telefono, email, clave, estado
+                FROM propietario
+                WHERE estado = TRUE
+                AND (nombre LIKE @term OR apellido LIKE @term OR dni LIKE @term)
+                ORDER BY apellido
+                LIMIT 20;";
+    
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@term", $"%{term}%");
+    
+                connection.Open();
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lista.Add(new Propietario
+                        {
+                            IdPropietario = reader.GetInt32(reader.GetOrdinal("id_propietario")),
+                            Nombre = reader.GetString(reader.GetOrdinal("nombre")),
+                            Apellido = reader.GetString(reader.GetOrdinal("apellido")),
+                            Dni = reader.GetString(reader.GetOrdinal("dni")),
+                            Estado = reader.GetBoolean(reader.GetOrdinal("estado"))
+                        });
+                    }
+                }
+            }
+        }
+        return lista;
+    }
 }

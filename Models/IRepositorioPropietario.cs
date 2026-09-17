@@ -8,5 +8,6 @@ namespace Inmobiliaria_BarrosoEsteban
 		List<Propietario> Listar(int paginaNro = 1, int tamPagina = 10, string? busqueda = null);
     	Propietario ObtenerPorId(int id);
 		int Reactivar(int id);
+		List<Propietario> Buscar(string term);
 	}
 }

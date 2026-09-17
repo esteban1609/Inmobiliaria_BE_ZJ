@@ -197,14 +197,18 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
     }
 
 
-    public IList<Inmueble> Listar(int paginaNro = 1, int tamPagina = 10)
+    public IList<Inmueble> Listar(int paginaNro = 1, int tamPagina = 10, string? busqueda = null)
     {
         var lista = new List<Inmueble>();
-
-        using var connection =
-            new MySqlConnection(connectionString);
-
-        string sql = @"
+    
+        using var connection = new MySqlConnection(connectionString);
+    
+        // Busca por dirección del inmueble o nombre/apellido del propietario
+        string filtro = string.IsNullOrWhiteSpace(busqueda)
+            ? ""
+            : "WHERE i.direccion LIKE @busqueda OR p.nombre LIKE @busqueda OR p.apellido LIKE @busqueda";
+    
+        string sql = $@"
                 SELECT
                     i.id_inmueble,
                     i.direccion,
@@ -221,22 +225,30 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
                     p.apellido AS propietario_apellido,
                     t.Nombre AS tipo_nombre
                 FROM inmueble i
-
+    
                 INNER JOIN propietario p
                     ON i.id_propietario = p.id_propietario
-                    
+    
                 INNER JOIN TipoInmueble t
                     ON i.id_tipo = t.id_tipo
-
+    
+                {filtro}
+    
                 ORDER BY i.id_inmueble
                 LIMIT @tamPagina OFFSET @offset";
-
+    
         using var command = new MySqlCommand(sql, connection);
-
+    
         int offset = (paginaNro - 1) * tamPagina;
-
+    
         command.Parameters.AddWithValue("@tamPagina", tamPagina);
         command.Parameters.AddWithValue("@offset", offset);
+    
+        if (!string.IsNullOrWhiteSpace(busqueda))
+        {
+            command.Parameters.AddWithValue("@busqueda", $"%{busqueda}%");
+        }
+    
         connection.Open();
         using var reader = command.ExecuteReader();
         while (reader.Read())
@@ -266,10 +278,10 @@ public class RepositorioInmueble : RepositorioBase, IRepositorioInmueble
                     Nombre = reader.GetString("tipo_nombre")
                 }
             };
-
+    
             lista.Add(inmueble);
         }
-
+    
         return lista;
     }
 

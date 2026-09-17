@@ -83,5 +83,19 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             repositorio.Reactivar(id);
             return RedirectToAction(nameof(Index));
         }
+         [HttpGet]
+        public JsonResult BuscarJson(string term)
+        {
+            var lista = repositorio.Buscar(term ?? "");
+        
+            var resultado = lista.Select(p => new
+            {
+                id = p.IdPropietario,
+                text = $"{p.Nombre} {p.Apellido}"
+            });
+        
+            return Json(new { results = resultado });
+        }
     }
+    
 }

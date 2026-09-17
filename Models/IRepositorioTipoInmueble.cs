@@ -11,5 +11,6 @@ namespace Inmobiliaria_BarrosoEsteban
         IList<TipoInmueble> Listar(int paginaNro = 1, int tamPagina = 10);
         TipoInmueble? ObtenerPorId(int id);
         int Reactivar(int id);
+        List<TipoInmueble> Buscar(string term);
     }
 }

@@ -167,6 +167,38 @@ public class RepositorioTipoInmueble : RepositorioBase, IRepositorioTipoInmueble
         return tipo;
     }
 
+    public List<TipoInmueble> Buscar(string term)
+    {
+        List<TipoInmueble> lista = new List<TipoInmueble>();
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            string sql = @"SELECT id_tipo, Nombre
+                FROM TipoInmueble
+                WHERE Nombre LIKE @term
+                ORDER BY Nombre
+                LIMIT 20;";
+    
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@term", $"%{term}%");
+    
+                connection.Open();
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        lista.Add(new TipoInmueble
+                        {
+                            id_tipo = reader.GetInt32(reader.GetOrdinal("id_tipo")),
+                            Nombre = reader.GetString(reader.GetOrdinal("Nombre"))
+                        });
+                    }
+                }
+            }
+        }
+        return lista;
+    }
+
 
 }
 

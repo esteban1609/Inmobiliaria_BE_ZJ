@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Inmobiliaria_BarrosoEsteban.Models;
-using Inmobiliaria_BarrosoEsteban;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Inmobiliaria_BarrosoEsteban.Controllers
@@ -14,6 +13,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
         private readonly IRepositorioTipoInmueble repoTipoInmueble;
 
         private readonly IRepositorioImagen repositorioImagen;
+        
 
         public InmuebleController(IRepositorioInmueble repositorio, IRepositorioPropietario repoPropietario, IRepositorioTipoInmueble repositorioTipoInmueble, IRepositorioImagen repositorioImagen)
         {
@@ -24,55 +24,45 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
         }
 
         // LISTADO
-        public IActionResult Index(bool? estado, int? idPropietario ,int paginaNro = 1,int tamPagina = 10)
+        public IActionResult Index(bool? estado, int? idPropietario, string? busqueda,int paginaNro = 1, int tamPagina = 10)
         {
             IList<Inmueble> lista;
-
+        
             if (idPropietario.HasValue)
             {
-                lista = repositorio.ListarPorPropietario(
-                    idPropietario.Value
-                );
-
-                // Si además eligió estado, filtramos el resultado
+                lista = repositorio.ListarPorPropietario(idPropietario.Value);
                 if (estado.HasValue)
-                {
-                    lista = lista
-                        .Where(i => i.Estado == estado.Value)
-                        .ToList();
-                }
+                    lista = lista.Where(i => i.Estado == estado.Value).ToList();
+        
+                // Trae SOLO el nombre del propietario seleccionado (no la lista completa)
+                var propietarioSel = repoPropietario.ObtenerPorId(idPropietario.Value);
+                ViewBag.PropietarioSeleccionadoId = idPropietario.Value;
+                ViewBag.PropietarioSeleccionadoNombre = propietarioSel != null
+                    ? $"{propietarioSel.Nombre} {propietarioSel.Apellido}"
+                    : "";
             }
             else if (estado.HasValue)
             {
-                lista = repositorio.ListarPorEstado(
-                    estado.Value
-                );
+                lista = repositorio.ListarPorEstado(estado.Value);
             }
             else
             {
-                lista = repositorio.Listar(paginaNro,tamPagina);
+                lista = repositorio.Listar(paginaNro, tamPagina, busqueda);
             }
-
-            // Lista de propietarios para el select
-            ViewBag.Propietarios = repoPropietario.Listar();
-
-            // Mantener los filtros seleccionados
+        
             ViewBag.EstadoSeleccionado = estado;
-            ViewBag.PropietarioSeleccionado = idPropietario;
-
             ViewBag.PaginaNro = paginaNro;
             ViewBag.TamPagina = tamPagina;
-
+            ViewBag.Busqueda = busqueda;
+        
             return View(lista);
         }
-
 
 
         // CREATE GET
         public IActionResult Create()
         {
-            ViewBag.Propietarios = repoPropietario.Listar();
-            ViewBag.TiposInmueble = repoTipoInmueble.Listar();
+            
             return View();
         }
 
@@ -156,8 +146,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
                 repositorio.Alta(inmueble);
                 return RedirectToAction(nameof(Index));
             }
-            ViewBag.Propietarios = repoPropietario.Listar();
-            ViewBag.TiposInmueble = repoTipoInmueble.Listar();
+            
             return View(inmueble);
         }
 
@@ -171,8 +160,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             {
                 return NotFound();
             }
-            ViewBag.Propietarios = repoPropietario.Listar();
-            ViewBag.TiposInmueble = repoTipoInmueble.Listar();
+            
             return View(inmueble);
         }
 
@@ -188,8 +176,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
                 repositorio.Modificacion(i);
                 return RedirectToAction(nameof(Index));
             }
-            ViewBag.Propietarios = repoPropietario.Listar();
-            ViewBag.TiposInmueble = repoTipoInmueble.Listar();
+            
             return View(i);
         }
 
