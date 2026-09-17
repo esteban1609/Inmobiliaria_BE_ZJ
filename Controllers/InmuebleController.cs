@@ -85,6 +85,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
         // POST: Inmuebles/Portada
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public ActionResult Portada(Imagen entidad, [FromServices] IWebHostEnvironment environment)
         {
             try
