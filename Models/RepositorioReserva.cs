@@ -110,12 +110,17 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
     }
 
     // Trae también nombre del inquilino y dirección del inmueble, para que la vista sea legible
-    public List<Reserva> Listar(int paginaNro = 1, int tamPagina = 10)
+    public List<Reserva> Listar(int paginaNro = 1, int tamPagina = 10, string? busqueda = null)
     {
         List<Reserva> lista = new List<Reserva>();
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string sql = @"SELECT r.id_reserva, r.id_inquilino, r.id_inmueble, r.monto_dia, 
+            // Busca por nombre/apellido del inquilino o dirección del inmueble
+            string filtro = string.IsNullOrWhiteSpace(busqueda)
+                ? ""
+                : "WHERE i.nombre LIKE @busqueda OR i.apellido LIKE @busqueda OR m.direccion LIKE @busqueda";
+
+            string sql = $@"SELECT r.id_reserva, r.id_inquilino, r.id_inmueble, r.monto_dia, 
                             r.fecha_desde, r.fecha_hasta, r.estado,
                             r.id_usuario_creador, r.id_usuario_terminador,
                             CONCAT(i.nombre, ' ', i.apellido) AS nombre_inquilino,
@@ -127,18 +132,22 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
                             INNER JOIN inmueble m ON r.id_inmueble = m.id_inmueble
                             LEFT JOIN usuario uc ON r.id_usuario_creador = uc.id_usuario
                             LEFT JOIN usuario ut ON r.id_usuario_terminador = ut.id_usuario
+                            {filtro}
                             ORDER BY r.id_reserva
                             LIMIT @tamPagina OFFSET @offset";
 
-
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
-
                 int offset = (paginaNro - 1) * tamPagina;
 
                 command.Parameters.AddWithValue("@tamPagina", tamPagina);
                 command.Parameters.AddWithValue("@offset", offset);
-                
+
+                if (!string.IsNullOrWhiteSpace(busqueda))
+                {
+                    command.Parameters.AddWithValue("@busqueda", $"%{busqueda}%");
+                }
+
                 connection.Open();
                 using (MySqlDataReader reader = command.ExecuteReader())
                 {

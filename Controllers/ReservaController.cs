@@ -110,12 +110,12 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
             return View(lista);
         }
 
-        public IActionResult Index(int paginaNro = 1, int tamPagina = 10)
+        public IActionResult Index(int paginaNro = 1, int tamPagina = 10, string? busqueda = null)
         {
-
-            var lista = repositorio.Listar(paginaNro, tamPagina);
+            var lista = repositorio.Listar(paginaNro, tamPagina, busqueda);
             ViewBag.PaginaNro = paginaNro;
             ViewBag.TamPagina = tamPagina;
+            ViewBag.Busqueda = busqueda;
             return View(lista);
         }
 
