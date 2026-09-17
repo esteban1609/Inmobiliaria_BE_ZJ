@@ -93,6 +93,8 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
         // ===================== PERFIL PROPIO (CUALQUIER USUARIO LOGUEADO) =====================
 
         // GET: Usuario/MiPerfil
+
+        
         public IActionResult MiPerfil()
         {
             int id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -103,6 +105,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
         // POST: Usuario/MiPerfil (solo nombre/apellido/avatar -- NO email ni rol)
         [HttpPost]
+        [Authorize]
 public IActionResult MiPerfil(Usuario u, IFormFile? avatarFile)
 {
     int id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -151,6 +154,7 @@ public IActionResult MiPerfil(Usuario u, IFormFile? avatarFile)
 
         // POST: Usuario/CambiarClave
         [HttpPost]
+        [Authorize]
         public IActionResult CambiarClave(string claveActual, string claveNueva)
         {
             int id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
