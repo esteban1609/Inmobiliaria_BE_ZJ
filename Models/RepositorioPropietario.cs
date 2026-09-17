@@ -91,23 +91,34 @@ public class RepositorioPropietario : RepositorioBase, IRepositorioPropietario
         return res;
     }
 
-    public List<Propietario> Listar(int paginaNro = 1, int tamPagina = 10)
+    public List<Propietario> Listar(int paginaNro = 1, int tamPagina = 10, string? busqueda = null)
     {
         List<Propietario> lista = new List<Propietario>();
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string sql = @"SELECT id_propietario, nombre, apellido, dni, telefono, email, clave, estado 
-            FROM propietario
-            ORDER BY id_propietario
-            LIMIT @tamPagina OFFSET @offset";
-
+            // El WHERE se arma condicionalmente: si no hay término de búsqueda, trae todo (paginado)
+            string filtro = string.IsNullOrWhiteSpace(busqueda)
+                ? ""
+                : "WHERE nombre LIKE @busqueda OR apellido LIKE @busqueda OR dni LIKE @busqueda";
+    
+            string sql = $@"SELECT id_propietario, nombre, apellido, dni, telefono, email, clave, estado 
+                FROM propietario
+                {filtro}
+                ORDER BY id_propietario
+                LIMIT @tamPagina OFFSET @offset";
+    
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 int offset = (paginaNro - 1) * tamPagina;
-
+    
                 command.Parameters.AddWithValue("@tamPagina", tamPagina);
                 command.Parameters.AddWithValue("@offset", offset);
-
+    
+                if (!string.IsNullOrWhiteSpace(busqueda))
+                {
+                    command.Parameters.AddWithValue("@busqueda", $"%{busqueda}%");
+                }
+    
                 connection.Open();
                 using (MySqlDataReader reader = command.ExecuteReader())
                 {
