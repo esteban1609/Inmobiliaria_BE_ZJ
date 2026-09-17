@@ -83,56 +83,99 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
 
         // POST: Inmuebles/Portada
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrador")]
-        public ActionResult Portada(Imagen entidad, [FromServices] IWebHostEnvironment environment)
+[HttpPost]
+[ValidateAntiForgeryToken]
+[Authorize(Roles = "Administrador")]
+public ActionResult Portada(
+    Imagen entidad,
+    [FromServices] IWebHostEnvironment environment)
+{
+    try
+    {
+        var inmueble = repositorio.ObtenerPorId(entidad.InmuebleId);
+
+        if (inmueble == null)
         {
-            try
+            return NotFound();
+        }
+
+        // Eliminar portada anterior
+        if (!string.IsNullOrWhiteSpace(inmueble.Portada))
+        {
+            string rutaEliminar = Path.Combine(
+                environment.WebRootPath,
+                "Uploads",
+                "Inmuebles",
+                Path.GetFileName(inmueble.Portada)
+            );
+
+            if (System.IO.File.Exists(rutaEliminar))
             {
-                //Recuperar el inmueble y eliminar la imagen anterior
-                var inmueble = repositorio.ObtenerPorId(entidad.InmuebleId);
-                if (inmueble != null && inmueble.Portada != null)
-                {
-                    string rutaEliminar = Path.Combine(environment.WebRootPath, "Uploads", "Inmuebles", Path.GetFileName(inmueble.Portada));
-                    System.IO.File.Delete(rutaEliminar);
-                }
-                if (entidad.Archivo != null)
-                {
-                    string wwwPath = environment.WebRootPath;
-                    string path = Path.Combine(wwwPath, "Uploads");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    path = Path.Combine(path, "Inmuebles");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    //string fileName = Path.GetFileName(entidad.Archivo.FileName);//este nombre se puede repetir
-                    string fileName = "portada_" + entidad.InmuebleId + Path.GetExtension(entidad.Archivo.FileName);
-                    string rutaFisicaCompleta = Path.Combine(path, fileName);
-                    using (var stream = new FileStream(rutaFisicaCompleta, FileMode.Create))
-                    {
-                        entidad.Archivo.CopyTo(stream);
-                    }
-                    entidad.Url = Path.Combine("/Uploads/Inmuebles", fileName);
-                }
-                else //sin imagen
-                {
-                    entidad.Url = string.Empty;
-                }
-                repositorio.ModificarPortada(entidad.InmuebleId, entidad.Url);
-                TempData["Mensaje"] = "Portada actualizada correctamente";
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = ex.Message;
-                return RedirectToAction(nameof(Imagenes), new { id = entidad.InmuebleId });
+                System.IO.File.Delete(rutaEliminar);
             }
         }
+
+        // Si seleccionó una nueva imagen
+        if (entidad.Archivo != null)
+        {
+            string path = Path.Combine(
+                environment.WebRootPath,
+                "Uploads",
+                "Inmuebles"
+            );
+
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            string fileName =
+                "portada_" +
+                entidad.InmuebleId +
+                Path.GetExtension(entidad.Archivo.FileName);
+
+            string rutaFisicaCompleta =
+                Path.Combine(path, fileName);
+
+            using (var stream = new FileStream(
+                rutaFisicaCompleta,
+                FileMode.Create))
+            {
+                entidad.Archivo.CopyTo(stream);
+            }
+
+            // URL para mostrar la imagen en el navegador
+            entidad.Url = $"/Uploads/Inmuebles/{fileName}";
+        }
+        else
+        {
+            entidad.Url = string.Empty;
+        }
+
+        repositorio.ModificarPortada(
+            entidad.InmuebleId,
+            entidad.Url
+        );
+
+        TempData["Mensaje"] =
+            "Portada actualizada correctamente";
+
+        // Volver al administrador de imágenes
+        return RedirectToAction(
+            nameof(Imagenes),
+            new { id = entidad.InmuebleId }
+        );
+    }
+    catch (Exception ex)
+    {
+        TempData["Error"] = ex.Message;
+
+        return RedirectToAction(
+            nameof(Imagenes),
+            new { id = entidad.InmuebleId }
+        );
+    }
+}
 
 
 
