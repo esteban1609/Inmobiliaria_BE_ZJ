@@ -30,6 +30,7 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
         // POST: Login/Index
         [HttpPost]
         [AllowAnonymous]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(string email, string clave, string? returnUrl = null)
         {
             var usuario = repositorio.ObtenerPorEmail(email);
@@ -40,7 +41,17 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
                 return View();
             }
 
-            var resultado = hasher.VerifyHashedPassword(usuario, usuario.Clave, clave);
+            PasswordVerificationResult resultado;
+            try
+            {
+                resultado = hasher.VerifyHashedPassword(usuario, usuario.Clave, clave);
+            }
+            catch (FormatException)
+            {
+                // Captura claves con mal formato Base64 o texto plano sin romper la app
+                resultado = PasswordVerificationResult.Failed;
+            }
+
             if (resultado == PasswordVerificationResult.Failed)
             {
                 ModelState.AddModelError(string.Empty, "Email o contraseña incorrectos");
@@ -65,7 +76,6 @@ namespace Inmobiliaria_BarrosoEsteban.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-
         // POST: Login/Logout
         [HttpPost]
         public async Task<IActionResult> Logout()

@@ -66,7 +66,7 @@ Para probar la autenticación y los distintos niveles de acceso en la aplicació
 
 | Rol | Email | Contraseña |
 | :--- | :--- | :--- |
-| **Administrador** | `admin@inmobiliaria.com` | `admin123` |
+| **Administrador** | `admin@inmobiliaria.com` | `Admin123` |
 | **Empleado** | `empleado@inmobiliaria.com` | `empleado123` |
 
 ---

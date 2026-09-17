@@ -4,6 +4,7 @@ using Inmobiliaria_BarrosoEsteban;
 using Microsoft.AspNetCore.Authorization;
 namespace Inmobiliaria_.Net_Core.Controllers
 {
+    [Authorize]
     public class InquilinosController : Controller
     {
         private readonly IRepositorioInquilino repositorio;

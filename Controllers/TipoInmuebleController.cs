@@ -1,10 +1,13 @@
 
-
-
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;            
+using Microsoft.AspNetCore.Authorization;  
+using Inmobiliaria_BarrosoEsteban.Models;  
 
 namespace Inmobiliaria_BarrosoEsteban
+
+
 {
+    [Authorize]
     public class TipoInmuebleController : Controller
     {
         private readonly IRepositorioTipoInmueble repositorio;
@@ -24,6 +27,7 @@ namespace Inmobiliaria_BarrosoEsteban
         }
 
         //CREATE GET
+        [Authorize(Roles = "Administrador")]
         public IActionResult Create()
         {
             return View();
@@ -32,6 +36,7 @@ namespace Inmobiliaria_BarrosoEsteban
         //CREATE POST
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public IActionResult Create(TipoInmueble tipoInmueble)
         {
             if (ModelState.IsValid)
@@ -45,6 +50,7 @@ namespace Inmobiliaria_BarrosoEsteban
         // EDIT POST
         [HttpPost]
         [ValidateAntiForgeryToken]
+        
         public IActionResult Edit(int id, TipoInmueble tipo)
         {
             tipo.id_tipo = id;
@@ -88,6 +94,7 @@ namespace Inmobiliaria_BarrosoEsteban
         // BAJA LOGICA
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public IActionResult DarDeBaja(int id)
         {
             repositorio.Baja(id);
