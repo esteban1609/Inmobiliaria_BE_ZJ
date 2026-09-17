@@ -59,3 +59,14 @@ json
     "DefaultConnection": "Server=localhost;Port=3306;Database=reservas_temporales;User=root;Password=TU_PASSWORD;"
   }
 }
+
+## 🔐 Usuarios del Sistema (Credenciales de Prueba)
+
+Para probar la autenticación y los distintos niveles de acceso en la aplicación, se proporcionan los siguientes usuarios predeterminados:
+
+| Rol | Email | Contraseña |
+| :--- | :--- | :--- |
+| **Administrador** | `admin@inmobiliaria.com` | `admin123` |
+| **Empleado** | `empleado@inmobiliaria.com` | `empleado123` |
+
+---
