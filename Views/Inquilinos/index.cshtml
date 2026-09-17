@@ -1,113 +1,78 @@
-@model IEnumerable<Inmobiliaria_BarrosoEsteban.Models.Inquilino>
+@model IEnumerable<Inquilino>
 
-<div class="container mt-4">
+<h1>Inquilinos</h1>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold mb-1">Inquilinos</h2>
-            <p class="text-muted mb-0">Administración de inquilinos registrados</p>
-        </div>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a asp-action="Create" class="btn btn-primary">Nuevo Inquilino</a>
 
-        <a asp-action="Create" class="btn btn-primary">
-            + Nuevo Inquilino
-        </a>
-    </div>
+    <form asp-action="Index" method="get" class="d-flex" style="width: 300px;">
+        <input type="hidden" name="tamPagina" value="@ViewBag.TamPagina" />
+        <input type="text" name="busqueda" value="@ViewBag.Busqueda"
+               class="form-control me-2" placeholder="Buscar por nombre, apellido o DNI..." />
+        <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+    </form>
+</div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
+<table class="table">
+    <thead>
+        <tr>
+            <th>DNI</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Estado</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="@(item.Estado ? "" : "table-secondary text-muted")">
+                <td>@item.Dni</td>
+                <td>@item.Nombre</td>
+                <td>@item.Apellido</td>
+                <td>@item.Telefono</td>
+                <td>@item.Email</td>
+                <td>
+                    @if (item.Estado)
+                    {
+                        <span class="badge bg-success">Activo</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Inactivo</span>
+                    }
+                </td>
+                <td>
+                    @if (item.Estado)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.IdInquilino"
+                            class="btn btn-sm btn-outline-primary me-2">
+                            Editar
+                        </a>
+                        <form asp-action="Delete" asp-route-id="@item.IdInquilino" method="post" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Dar de baja</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-action="Reactivar" asp-route-id="@item.IdInquilino" method="post" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-outline-success">Reactivar</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-
-                    <thead class="table-light">
-                        <tr>
-                            <th class="ps-4">Nombre</th>
-                            <th>Apellido</th>
-                            <th>DNI</th>
-                            <th>Teléfono</th>
-                            <th>Email</th>
-                            <th>Estado</th>
-                            <th class="text-center">Acciones</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td class="ps-4 fw-semibold">
-                                    @item.Nombre
-                                </td>
-
-                                <td>
-                                    @item.Apellido
-                                </td>
-
-                                <td>
-                                    @item.Dni
-                                </td>
-
-                                <td>
-                                    @item.Telefono
-                                </td>
-
-                                <td>
-                                    @item.Email
-                                </td>
-
-                                <td>
-                                    @if (item.Estado)
-                                    {
-                                        <span class="badge bg-success">Activo</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-danger">Inactivo</span>
-                                    }
-                                </td>
-
-                                <td>
-                                    @if (item.Estado)
-                                    {
-                                        <a asp-action="Edit" asp-route-id="@item.IdInquilino"
-                                            class="btn btn-sm btn-outline-primary me-2">
-                                            Editar
-                                        </a>
-
-                                        <form asp-action="DarDeBaja" asp-route-id="@item.IdInquilino" method="post"
-                                            style="display:inline">
-
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                Dar de baja
-                                            </button>
-                                        </form>
-                                    }
-                                    else
-                                    {
-                                        <form asp-action="Reactivar" asp-route-id="@item.IdInquilino" method="post"
-                                            style="display:inline">
-
-                                            <button type="submit" class="btn btn-sm btn-outline-success">
-                                                Dar de alta
-                                            </button>
-                                        </form>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-
-                </table>
-            </div>
-
-        </div>
-    </div>
-
-    <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
+<div class="d-flex justify-content-center align-items-center gap-3 mt-4">
 
     @if (ViewBag.PaginaNro > 1)
     {
         <a asp-action="Index" asp-route-paginaNro="@(ViewBag.PaginaNro - 1)" asp-route-tamPagina="@ViewBag.TamPagina"
+            asp-route-busqueda="@ViewBag.Busqueda"
             class="btn btn-outline-primary">
             Anterior
         </a>
@@ -120,11 +85,10 @@
     @if (Model.Count() == ViewBag.TamPagina)
     {
         <a asp-action="Index" asp-route-paginaNro="@(ViewBag.PaginaNro + 1)" asp-route-tamPagina="@ViewBag.TamPagina"
+            asp-route-busqueda="@ViewBag.Busqueda"
             class="btn btn-outline-primary">
             Siguiente
         </a>
     }
-
-</div>
 
 </div>

@@ -93,16 +93,21 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
         return res;
     }
 
-    public List<Inquilino> Listar(int paginaNro = 1, int tamPagina = 10)
+    public List<Inquilino> Listar(int paginaNro = 1, int tamPagina = 10, string? busqueda = null)
     {
         List<Inquilino> lista = new List<Inquilino>();
 
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string sql = @"SELECT id_inquilino, nombre, apellido, dni, telefono, email,estado
-                           FROM inquilino
-                           ORDER BY id_inquilino
-                           LIMIT @tamPagina OFFSET @offset";
+            string filtro = string.IsNullOrWhiteSpace(busqueda)
+                ? ""
+                : "WHERE nombre LIKE @busqueda OR apellido LIKE @busqueda OR dni LIKE @busqueda";
+
+            string sql = $@"SELECT id_inquilino, nombre, apellido, dni, telefono, email, estado
+                        FROM inquilino
+                        {filtro}
+                        ORDER BY id_inquilino
+                        LIMIT @tamPagina OFFSET @offset";
 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
@@ -111,6 +116,11 @@ public class RepositorioInquilino : RepositorioBase, IRepositorioInquilino
 
                 command.Parameters.AddWithValue("@tamPagina", tamPagina);
                 command.Parameters.AddWithValue("@offset", offset);
+
+                if (!string.IsNullOrWhiteSpace(busqueda))
+                {
+                    command.Parameters.AddWithValue("@busqueda", $"%{busqueda}%");
+                }
 
                 connection.Open();
 
