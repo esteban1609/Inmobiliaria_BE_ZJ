@@ -143,6 +143,9 @@ ALTER TABLE pago
     ADD CONSTRAINT fk_pago_usuario_creador FOREIGN KEY (id_usuario_creador) REFERENCES usuario(id_usuario),
     ADD CONSTRAINT fk_pago_usuario_anulador FOREIGN KEY (id_usuario_anulador) REFERENCES usuario(id_usuario);
 
+ALTER TABLE reserva
+    ADD COLUMN fecha_terminacion_efectiva DATE NULL;
+
 -- =========================================================
 -- Datos iniciales de prueba
 -- =========================================================

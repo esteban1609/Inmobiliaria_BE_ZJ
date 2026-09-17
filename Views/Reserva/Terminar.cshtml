@@ -1,0 +1,39 @@
+@model Reserva
+
+<h1>Terminar Reserva Anticipadamente</h1>
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<dl class="row">
+    <dt class="col-sm-3">Inquilino</dt>
+    <dd class="col-sm-9">@Model.NombreInquilino</dd>
+    <dt class="col-sm-3">Inmueble</dt>
+    <dd class="col-sm-9">@Model.DireccionInmueble</dd>
+    <dt class="col-sm-3">Período original</dt>
+    <dd class="col-sm-9">@Model.FechaDesde.ToShortDateString() al @Model.FechaHasta.ToShortDateString()</dd>
+</dl>
+
+<form asp-action="Terminar" asp-route-id="@Model.IdReserva" method="get" class="mb-3">
+    <div class="row align-items-end">
+        <div class="col-md-4">
+            <label>Fecha en que se hace efectiva la terminación</label>
+            <input type="date" name="fechaEfectiva" value="@(((DateTime)ViewBag.FechaEfectiva).ToString("yyyy-MM-dd"))"
+                   min="@Model.FechaDesde.ToString("yyyy-MM-dd")" max="@Model.FechaHasta.ToString("yyyy-MM-dd")"
+                   class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-outline-secondary">Recalcular</button>
+        </div>
+    </div>
+</form>
+
+<div class="alert alert-warning">
+    <strong>Multa calculada: @(((decimal)ViewBag.Multa).ToString("C"))</strong>
+    <p class="mb-0 mt-2">Este monto se va a cargar automáticamente como un pago de la reserva. No se realizan devoluciones de dinero en ningún caso.</p>
+</div>
+
+<form asp-action="Terminar" asp-route-id="@Model.IdReserva" method="post">
+    <input type="hidden" name="fechaEfectiva" value="@(((DateTime)ViewBag.FechaEfectiva).ToString("yyyy-MM-dd"))" />
+    <button type="submit" class="btn btn-danger">Confirmar terminación y registrar multa</button>
+    <a asp-action="Details" asp-route-id="@Model.IdReserva" class="btn btn-secondary">Cancelar</a>
+</form>

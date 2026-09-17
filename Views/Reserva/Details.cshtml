@@ -64,6 +64,9 @@
     </tbody>
 </table>
 
-<p><a asp-controller="Pago" asp-action="Index" asp-route-idReserva="@Model.IdReserva">Ver todos los pagos</a></p>
+<p>
+    <a asp-controller="Pago" asp-action="Index" asp-route-idReserva="@Model.IdReserva">Ver todos los pagos</a> | 
+    <a asp-action="Terminar" asp-route-id="@Model.IdReserva">Terminar reserva</a>
+</p>
 
 <a asp-action="Index">Volver al listado de reservas</a>

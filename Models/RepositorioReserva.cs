@@ -122,7 +122,7 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
 
             string sql = $@"SELECT r.id_reserva, r.id_inquilino, r.id_inmueble, r.monto_dia, 
                             r.fecha_desde, r.fecha_hasta, r.estado,
-                            r.id_usuario_creador, r.id_usuario_terminador,
+                            r.id_usuario_creador, r.id_usuario_terminador,r.fecha_terminacion_efectiva,
                             CONCAT(i.nombre, ' ', i.apellido) AS nombre_inquilino,
                             m.direccion AS direccion_inmueble,
                             CONCAT(uc.nombre, ' ', uc.apellido) AS nombre_usuario_creador,
@@ -640,7 +640,7 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
         {
             string sql = @"SELECT r.id_reserva, r.id_inquilino, r.id_inmueble, r.monto_dia, 
                         r.fecha_desde, r.fecha_hasta, r.estado,
-                        r.id_usuario_creador, r.id_usuario_terminador,
+                        r.id_usuario_creador, r.id_usuario_terminador,r.fecha_terminacion_efectiva,
                         CONCAT(i.nombre, ' ', i.apellido) AS nombre_inquilino,
                         m.direccion AS direccion_inmueble,
                         CONCAT(uc.nombre, ' ', uc.apellido) AS nombre_usuario_creador,
@@ -686,7 +686,8 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
             IdUsuarioCreador = reader.IsDBNull(reader.GetOrdinal("id_usuario_creador")) ? null : reader.GetInt32(reader.GetOrdinal("id_usuario_creador")),
             IdUsuarioTerminador = reader.IsDBNull(reader.GetOrdinal("id_usuario_terminador")) ? null : reader.GetInt32(reader.GetOrdinal("id_usuario_terminador")),
             NombreUsuarioCreador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_creador")) ? null : reader.GetString(reader.GetOrdinal("nombre_usuario_creador")),
-            NombreUsuarioTerminador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_terminador")) ? null : reader.GetString(reader.GetOrdinal("nombre_usuario_terminador"))
+            NombreUsuarioTerminador = reader.IsDBNull(reader.GetOrdinal("nombre_usuario_terminador")) ? null : reader.GetString(reader.GetOrdinal("nombre_usuario_terminador")),
+            FechaTerminacionEfectiva = reader.IsDBNull(reader.GetOrdinal("fecha_terminacion_efectiva"))  ? null : reader.GetDateTime(reader.GetOrdinal("fecha_terminacion_efectiva"))
         };
     }
 
@@ -719,5 +720,29 @@ public class RepositorioReserva : RepositorioBase, IRepositorioReserva
                 return cantidad > 0;
             }
         }
+    }
+
+    public int Terminar(int id, int idUsuarioTerminador, DateTime fechaTerminacionEfectiva)
+    {
+        int res = -1;
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            string sql = @"UPDATE reserva SET 
+                    estado = FALSE, 
+                    id_usuario_terminador = @idUsuarioTerminador,
+                    fecha_terminacion_efectiva = @fechaTerminacionEfectiva
+                WHERE id_reserva = @id;";
+    
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@idUsuarioTerminador", idUsuarioTerminador);
+                command.Parameters.AddWithValue("@fechaTerminacionEfectiva", fechaTerminacionEfectiva);
+                command.Parameters.AddWithValue("@id", id);
+    
+                connection.Open();
+                res = command.ExecuteNonQuery();
+            }
+        }
+        return res;
     }
 }

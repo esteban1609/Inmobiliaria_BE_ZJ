@@ -238,5 +238,89 @@ public IActionResult Create(Reserva r)
             repositorio.Reactivar(id);
             return RedirectToAction(nameof(Index));
         }
+
+        // GET: Reserva/Terminar/5 -- muestra la multa calculada, permite ajustar la fecha efectiva
+        public IActionResult Terminar(int id, DateTime? fechaEfectiva)
+        {
+            var r = repositorio.ObtenerPorId(id);
+            if (r == null) return NotFound();
+            if (!r.Estado)
+            {
+                TempData["Error"] = "Esta reserva ya no está activa.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+        
+            DateTime fecha = fechaEfectiva ?? DateTime.Today;
+            if (fecha < r.FechaDesde) fecha = r.FechaDesde;
+            if (fecha > r.FechaHasta) fecha = r.FechaHasta;
+        
+            decimal multa = CalcularMulta(r, fecha);
+        
+            ViewBag.FechaEfectiva = fecha;
+            ViewBag.Multa = multa;
+            return View(r);
+        }
+
+        // POST: Reserva/Terminar/5 -- recalcula la multa en el servidor (nunca confía en un monto
+        // que venga del formulario) y recién ahí genera el pago y termina la reserva.
+        [HttpPost, ActionName("Terminar")]
+        public IActionResult TerminarConfirmado(int id, DateTime fechaEfectiva)
+        {
+            var r = repositorio.ObtenerPorId(id);
+            if (r == null) return NotFound();
+            if (!r.Estado)
+            {
+                TempData["Error"] = "Esta reserva ya no está activa.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+        
+            if (fechaEfectiva < r.FechaDesde || fechaEfectiva > r.FechaHasta)
+            {
+                ModelState.AddModelError(string.Empty, "La fecha de terminación debe estar dentro del período original de la reserva.");
+                ViewBag.FechaEfectiva = fechaEfectiva;
+                ViewBag.Multa = CalcularMulta(r, fechaEfectiva);
+                return View("Terminar", r);
+            }
+        
+            decimal multa = CalcularMulta(r, fechaEfectiva);
+        
+            // "Si el inquilino no paga en el momento, no puede finalizarse" -- por eso el pago
+            // de la multa y la terminación de la reserva se hacen juntos, en la misma operación.
+            var pagoMulta = new Pago
+            {
+                IdReserva = r.IdReserva,
+                Concepto = "Multa por cancelación anticipada",
+                FechaPago = DateTime.Today,
+                Importe = multa
+            };
+            repositorioPago.Alta(pagoMulta, IdUsuarioActual);
+        
+            repositorio.Terminar(id, IdUsuarioActual, fechaEfectiva);
+        
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        
+        // Cálculo de la multa según la narrativa:
+        // - Menos de la mitad del tiempo original cumplido -> 50% del alquiler restante
+        // - La mitad o más cumplido -> 25% del alquiler restante
+        // "Alquiler restante" = lo que faltaba cobrar de los días que no se van a usar.
+        private decimal CalcularMulta(Reserva r, DateTime fechaEfectiva)
+        {
+            int diasOriginales = (r.FechaHasta - r.FechaDesde).Days;
+            if (diasOriginales <= 0) diasOriginales = 1;
+        
+            int diasCumplidos = (fechaEfectiva - r.FechaDesde).Days;
+            if (diasCumplidos < 0) diasCumplidos = 0;
+            if (diasCumplidos > diasOriginales) diasCumplidos = diasOriginales;
+        
+            int diasRestantes = diasOriginales - diasCumplidos;
+            decimal montoRestante = r.MontoDia * diasRestantes;
+        
+            decimal porcentajeMulta = diasCumplidos < (diasOriginales / 2.0)
+                ? 0.50m
+                : 0.25m;
+        
+            return Math.Round(montoRestante * porcentajeMulta, 2);
+        }
     }
 }

@@ -55,6 +55,10 @@ namespace Inmobiliaria_BarrosoEsteban.Models
         public int? IdUsuarioTerminador { get; set; }
         public string? NombreUsuarioCreador { get; set; }
         public string? NombreUsuarioTerminador { get; set; }
+        
+        [Display(Name = "Fecha de Terminación Efectiva")]
+        public DateTime? FechaTerminacionEfectiva { get; set; }
+        
     }
 }
 
